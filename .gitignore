@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.firebase/
+.firebaserc.local
+.env
+.env.*
+!.env.example
+functions/lib/
+functions/node_modules/
+*.tsbuildinfo
+install.log
+install-error.log
+preview.log
+preview-error.log
