@@ -33,7 +33,10 @@ export interface DashboardStats {
   totalResponses: number
   practices: { yes: number; no: number }
   practicedSports: CountItem[]
+  frequencies?: CountItem[]
   desiredSports: CountItem[]
+  desiredAtSchool?: CountItem[]
   barriers: CountItem[]
   updatedAt?: unknown
 }
+

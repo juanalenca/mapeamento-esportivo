@@ -34,7 +34,9 @@ function updateLocalStats(response: SurveyResponse): DashboardStats {
       ? { yes: base.practices.yes + 1, no: base.practices.no }
       : { yes: base.practices.yes, no: base.practices.no + 1 },
     practicedSports: increment(base.practicedSports, response.practicedSports),
+    frequencies: increment(base.frequencies ?? [], response.frequency ? [response.frequency] : []),
     desiredSports: increment(base.desiredSports, [response.desiredSport]),
+    desiredAtSchool: increment(base.desiredAtSchool ?? [], response.desiredAtSchool ? [response.desiredAtSchool] : []),
     barriers: increment(base.barriers, response.barriers),
     updatedAt: new Date().toISOString(),
   }
