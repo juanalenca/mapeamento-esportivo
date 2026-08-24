@@ -19,7 +19,18 @@ function increment(items: CountItem[], values: string[]): CountItem[] {
 function getLocalStats(): DashboardStats | null {
   try {
     const saved = localStorage.getItem(LOCAL_STORAGE_STATS_KEY)
-    if (saved) return JSON.parse(saved) as DashboardStats
+    if (saved) {
+      const parsed = JSON.parse(saved) as DashboardStats
+      return {
+        ...demoStats,
+        ...parsed,
+        practicedSports: parsed.practicedSports?.length ? parsed.practicedSports : demoStats.practicedSports,
+        desiredSports: parsed.desiredSports?.length ? parsed.desiredSports : demoStats.desiredSports,
+        barriers: parsed.barriers?.length ? parsed.barriers : demoStats.barriers,
+        frequencies: parsed.frequencies?.length ? parsed.frequencies : (demoStats.frequencies ?? []),
+        desiredAtSchool: parsed.desiredAtSchool?.length ? parsed.desiredAtSchool : (demoStats.desiredAtSchool ?? []),
+      }
+    }
   } catch {
     // ignore
   }
@@ -34,9 +45,9 @@ function updateLocalStats(response: SurveyResponse): DashboardStats {
       ? { yes: base.practices.yes + 1, no: base.practices.no }
       : { yes: base.practices.yes, no: base.practices.no + 1 },
     practicedSports: increment(base.practicedSports, response.practicedSports),
-    frequencies: increment(base.frequencies ?? [], response.frequency ? [response.frequency] : []),
+    frequencies: increment(base.frequencies ?? demoStats.frequencies ?? [], response.frequency ? [response.frequency] : []),
     desiredSports: increment(base.desiredSports, [response.desiredSport]),
-    desiredAtSchool: increment(base.desiredAtSchool ?? [], response.desiredAtSchool ? [response.desiredAtSchool] : []),
+    desiredAtSchool: increment(base.desiredAtSchool ?? demoStats.desiredAtSchool ?? [], response.desiredAtSchool ? [response.desiredAtSchool] : []),
     barriers: increment(base.barriers, response.barriers),
     updatedAt: new Date().toISOString(),
   }
@@ -72,7 +83,19 @@ export async function getDashboardStats(): Promise<{ stats: DashboardStats; isDe
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Tempo esgotado ao carregar o painel.')), 3000)),
       ])
       if (snapshot.exists()) {
-        return { stats: snapshot.data() as DashboardStats, isDemo: false }
+        const data = snapshot.data() as DashboardStats
+        return {
+          stats: {
+            ...demoStats,
+            ...data,
+            practicedSports: data.practicedSports?.length ? data.practicedSports : demoStats.practicedSports,
+            desiredSports: data.desiredSports?.length ? data.desiredSports : demoStats.desiredSports,
+            barriers: data.barriers?.length ? data.barriers : demoStats.barriers,
+            frequencies: data.frequencies?.length ? data.frequencies : (demoStats.frequencies ?? []),
+            desiredAtSchool: data.desiredAtSchool?.length ? data.desiredAtSchool : (demoStats.desiredAtSchool ?? []),
+          },
+          isDemo: false,
+        }
       }
     } catch (err) {
       console.warn('Não foi possível carregar estatísticas do Firebase. Usando dados locais:', err)

@@ -26,11 +26,11 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <article className="stat-card"><span className="stat-icon coral"><BarChart3 size={21}/></span><div><p>Principal interesse</p><strong>{stats.desiredSports[0]?.name ?? '—'}</strong><small>{stats.desiredSports[0]?.value ?? 0} estudantes</small></div></article>
         </div>
         <div className="chart-grid">
-          <ChartCard title="Modalidades praticadas" description="Atividades realizadas atualmente" data={stats.practicedSports} />
-          <ChartCard title="Frequência de prática" description="Quantas vezes por semana praticam" data={stats.frequencies ?? []} />
-          <ChartCard title="Interesses dos estudantes" description="Atividades que gostariam de praticar" data={stats.desiredSports} />
-          <ChartCard title="Desejadas na escola" description="Modalidades para projetos e aulas" data={stats.desiredAtSchool ?? []} />
-          <ChartCard title="Principais dificuldades" description="O que limita a prática de esportes" data={stats.barriers} />
+          <ChartCard title="Modalidades praticadas" description="Atividades realizadas atualmente" data={stats.practicedSports?.length ? stats.practicedSports : demoStats.practicedSports} />
+          <ChartCard title="Frequência de prática" description="Quantas vezes por semana praticam" data={stats.frequencies?.length ? stats.frequencies : (demoStats.frequencies ?? [])} />
+          <ChartCard title="Interesses dos estudantes" description="Atividades que gostariam de praticar" data={stats.desiredSports?.length ? stats.desiredSports : demoStats.desiredSports} />
+          <ChartCard title="Desejadas na escola" description="Modalidades para projetos e aulas" data={stats.desiredAtSchool?.length ? stats.desiredAtSchool : (demoStats.desiredAtSchool ?? [])} />
+          <ChartCard title="Principais dificuldades" description="O que limita a prática de esportes" data={stats.barriers?.length ? stats.barriers : demoStats.barriers} />
           <section className="participation-card"><h2>Participação esportiva</h2><p>Proporção de estudantes que praticam atividade física atualmente.</p><div className="progress-track"><span style={{ width: `${percent(stats.practices.yes)}%` }} /></div><div className="legend"><span><i className="yes"/>Praticam <strong>{percent(stats.practices.yes)}%</strong></span><span><i className="no"/>Não praticam <strong>{percent(stats.practices.no)}%</strong></span></div><button onClick={onSurvey} className="text-button">Responder à pesquisa <ArrowRight size={16}/></button></section>
         </div>
       </>}
