@@ -1,6 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // FinFlow: regras de usuários autenticados
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
     function validSport(value) {
       return value in ['Futebol', 'Vôlei', 'Futsal', 'Basquete', 'Corrida/caminhada', 'Ciclismo', 'Musculação/academia', 'Dança', 'Artes marciais', 'Outro'];
     }
