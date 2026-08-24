@@ -12,3 +12,6 @@ install.log
 install-error.log
 preview.log
 preview-error.log
+historico.txt
+orientacoes.txt
+*.docx
