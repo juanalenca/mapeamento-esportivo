@@ -1,6 +1,7 @@
-import { addDoc, collection, doc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import { db, firebaseEnabled } from '../lib/firebase'
 import { demoStats } from '../data/demoStats'
+import { emptyStats } from '../data/emptyStats'
 import type { CountItem, DashboardStats, SurveyResponse } from '../types'
 
 const LOCAL_STORAGE_STATS_KEY = 'mapeamento_esportivo_local_stats'
@@ -65,7 +66,40 @@ function updateLocalStats(response: SurveyResponse): DashboardStats {
 export async function sendSurveyResponse(response: SurveyResponse) {
   if (firebaseEnabled && db) {
     try {
+      // 1. Grava a resposta individual anônima
       await addDoc(collection(db, 'surveyResponses'), { ...response, createdAt: serverTimestamp() })
+
+      // 2. Atualiza atomicamente os agregados no dashboardStats/current via transação
+      const statsRef = doc(db, 'dashboardStats', 'current')
+      await runTransaction(db, async (transaction) => {
+        const statsDoc = await transaction.get(statsRef)
+        const base: DashboardStats = statsDoc.exists()
+          ? (statsDoc.data() as DashboardStats)
+          : {
+              totalResponses: 0,
+              practices: { yes: 0, no: 0 },
+              practicedSports: [],
+              frequencies: [],
+              desiredSports: [],
+              desiredAtSchool: [],
+              barriers: [],
+            }
+
+        const updated: DashboardStats = {
+          totalResponses: (base.totalResponses || 0) + 1,
+          practices: response.practicesSport
+            ? { yes: (base.practices?.yes || 0) + 1, no: base.practices?.no || 0 }
+            : { yes: base.practices?.yes || 0, no: (base.practices?.no || 0) + 1 },
+          practicedSports: increment(base.practicedSports || [], response.practicedSports),
+          frequencies: increment(base.frequencies || [], response.frequency ? [response.frequency] : []),
+          desiredSports: increment(base.desiredSports || [], response.desiredSport ? [response.desiredSport] : []),
+          desiredAtSchool: increment(base.desiredAtSchool || [], response.desiredAtSchool ? [response.desiredAtSchool] : []),
+          barriers: increment(base.barriers || [], response.barriers),
+          updatedAt: new Date().toISOString(),
+        }
+
+        transaction.set(statsRef, updated, { merge: true })
+      })
     } catch (err) {
       console.warn('Firebase Firestore indisponível ou sem permissão remota. Salvando localmente para testes:', err)
     }
@@ -75,7 +109,7 @@ export async function sendSurveyResponse(response: SurveyResponse) {
   updateLocalStats(response)
 }
 
-export async function getDashboardStats(): Promise<{ stats: DashboardStats; isDemo: boolean }> {
+export async function getDashboardStats(): Promise<{ stats: DashboardStats; isDemo: boolean; isEmpty: boolean }> {
   if (firebaseEnabled && db) {
     try {
       const snapshot = await Promise.race([
@@ -84,26 +118,30 @@ export async function getDashboardStats(): Promise<{ stats: DashboardStats; isDe
       ])
       if (snapshot.exists()) {
         const data = snapshot.data() as DashboardStats
+        const realStats: DashboardStats = {
+          ...emptyStats,
+          ...data,
+          practicedSports: data.practicedSports?.length ? data.practicedSports : [],
+          desiredSports: data.desiredSports?.length ? data.desiredSports : [],
+          barriers: data.barriers?.length ? data.barriers : [],
+          frequencies: data.frequencies?.length ? data.frequencies : [],
+          desiredAtSchool: data.desiredAtSchool?.length ? data.desiredAtSchool : [],
+        }
         return {
-          stats: {
-            ...demoStats,
-            ...data,
-            practicedSports: data.practicedSports?.length ? data.practicedSports : demoStats.practicedSports,
-            desiredSports: data.desiredSports?.length ? data.desiredSports : demoStats.desiredSports,
-            barriers: data.barriers?.length ? data.barriers : demoStats.barriers,
-            frequencies: data.frequencies?.length ? data.frequencies : (demoStats.frequencies ?? []),
-            desiredAtSchool: data.desiredAtSchool?.length ? data.desiredAtSchool : (demoStats.desiredAtSchool ?? []),
-          },
+          stats: realStats,
           isDemo: false,
+          isEmpty: realStats.totalResponses === 0,
         }
       }
+      // Documento não existe — banco está vazio
+      return { stats: emptyStats, isDemo: false, isEmpty: true }
     } catch (err) {
       console.warn('Não foi possível carregar estatísticas do Firebase. Usando dados locais:', err)
     }
   }
   const local = getLocalStats()
   if (local) {
-    return { stats: local, isDemo: true }
+    return { stats: local, isDemo: true, isEmpty: false }
   }
-  return { stats: demoStats, isDemo: true }
+  return { stats: demoStats, isDemo: true, isEmpty: false }
 }

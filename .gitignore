@@ -15,3 +15,5 @@ preview-error.log
 historico.txt
 orientacoes.txt
 *.docx
+scripts/serviceAccountKey.json
+scripts/backups/

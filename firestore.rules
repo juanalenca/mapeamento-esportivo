@@ -40,7 +40,8 @@ service cloud.firestore {
 
     match /dashboardStats/current {
       allow get: if true;
-      allow list, create, update, delete: if false;
+      allow create, update: if true;
+      allow list, delete: if false;
     }
 
     match /{document=**} {
