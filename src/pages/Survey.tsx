@@ -189,10 +189,10 @@ export function Survey({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="demographic-fields-grid">
-            {/* Curso */}
+            {/* Curso / Itinerário */}
             <div className="form-group course-group">
               <label className="input-label" htmlFor="course-select">
-                Curso Técnico
+                Curso / Itinerário
               </label>
               <div className="select-wrapper">
                 <select
@@ -214,20 +214,20 @@ export function Survey({ onBack }: { onBack: () => void }) {
                   <input
                     type="text"
                     className="modern-text-input"
-                    placeholder="Digite o nome do seu curso..."
+                    placeholder="Digite o nome do seu curso ou itinerário..."
                     value={customCourse}
                     onChange={(e) => handleCustomCourseChange(e.target.value)}
                     autoFocus
                     maxLength={80}
                   />
-                  <small className="field-hint">Ex: Técnico em Enfermagem, Administração, etc.</small>
+                  <small className="field-hint">Ex: Ciências Humanas, Linguagens, Técnico em Enfermagem, etc.</small>
                 </div>
               )}
             </div>
 
-            {/* Série / Turma */}
+            {/* Série */}
             <div className="form-group">
-              <label className="input-label">Série / Turma</label>
+              <label className="input-label">Série</label>
               <div className="pill-group">
                 {grades.map((grade) => (
                   <button

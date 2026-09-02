@@ -190,9 +190,9 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           </div>
           <div className="chart-grid">
             <ChartCard
-              categoryBadge="Curso Técnico"
-              title="Distribuição por curso"
-              description="Distribuição dos participantes por curso na EREM Santa Ana"
+              categoryBadge="Curso / Itinerário"
+              title="Distribuição por curso / itinerário"
+              description="Distribuição dos participantes por curso ou itinerário na EREM Santa Ana"
               data={stats.courses?.length ? stats.courses : (demoStats.courses ?? [])}
             />
             <ChartCard
