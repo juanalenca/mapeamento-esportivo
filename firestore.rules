@@ -18,10 +18,10 @@ service cloud.firestore {
         && (!value.hasAny(['Nada dificulta']) || value.size() == 1);
     }
     function validCourse(value) {
-      return value in ['Desenvolvimento de Sistemas', 'Redes de Computadores', 'Administração', 'Outro'];
+      return value is string && value.size() >= 2 && value.size() <= 80;
     }
     function validGrade(value) {
-      return value in ['1º Ano', '2º Ano', '3º Ano', 'Módulo Subsequente'];
+      return value in ['1º Ano', '2º Ano', '3º Ano'];
     }
     function validAgeRange(value) {
       return value in ['14 a 15 anos', '16 a 17 anos', '18 anos ou mais'];

@@ -14,11 +14,11 @@ export const barriers = [
 ] as const
 
 export const courses = [
-  'Desenvolvimento de Sistemas', 'Redes de Computadores', 'Administração', 'Outro',
+  'Nutrição e Dietética', 'Farmácia', 'Enfermagem', 'Outro',
 ] as const
 
 export const grades = [
-  '1º Ano', '2º Ano', '3º Ano', 'Módulo Subsequente',
+  '1º Ano', '2º Ano', '3º Ano',
 ] as const
 
 export const ageRanges = [
@@ -32,7 +32,7 @@ export const genders = [
 export type Sport = (typeof sports)[number]
 export type Frequency = (typeof frequencies)[number]
 export type Barrier = (typeof barriers)[number]
-export type Course = (typeof courses)[number]
+export type Course = string
 export type Grade = (typeof grades)[number]
 export type AgeRange = (typeof ageRanges)[number]
 export type Gender = (typeof genders)[number]

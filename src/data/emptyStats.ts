@@ -8,4 +8,8 @@ export const emptyStats: DashboardStats = {
   desiredSports: [],
   desiredAtSchool: [],
   barriers: [],
+  courses: [],
+  grades: [],
+  ageRanges: [],
+  genders: [],
 }

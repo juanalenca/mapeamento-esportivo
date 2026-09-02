@@ -1,49 +1,516 @@
 import { useState, type FormEvent } from 'react'
-import { ArrowLeft, CheckCircle2, Send } from 'lucide-react'
-import { ageRanges, barriers, courses, frequencies, genders, grades, sports, type AgeRange, type Barrier, type Course, type Frequency, type Gender, type Grade, type Sport, type SurveyResponse } from '../types'
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Send,
+  GraduationCap,
+  Sparkles,
+  AlertCircle,
+  HelpCircle,
+  Activity,
+  ShieldCheck,
+  Check,
+} from 'lucide-react'
+import {
+  ageRanges,
+  barriers,
+  courses,
+  frequencies,
+  genders,
+  grades,
+  sports,
+  type AgeRange,
+  type Barrier,
+  type Frequency,
+  type Gender,
+  type Grade,
+  type Sport,
+  type SurveyResponse,
+} from '../types'
 import { sendSurveyResponse } from '../services/survey'
 
-const initialResponse: SurveyResponse = { course: 'Desenvolvimento de Sistemas', grade: '1º Ano', ageRange: '16 a 17 anos', gender: 'Prefiro não informar', practicesSport: true, practicedSports: [], frequency: '2–3 vezes por semana', desiredSport: 'Futebol', barriers: [], desiredAtSchool: 'Futebol' }
+const initialResponse: SurveyResponse = {
+  course: 'Nutrição e Dietética',
+  grade: '1º Ano',
+  ageRange: '16 a 17 anos',
+  gender: 'Prefiro não informar',
+  practicesSport: true,
+  practicedSports: [],
+  frequency: '2–3 vezes por semana',
+  desiredSport: 'Futebol',
+  barriers: [],
+  desiredAtSchool: 'Futebol',
+}
 
 export function Survey({ onBack }: { onBack: () => void }) {
   const [form, setForm] = useState<SurveyResponse>(initialResponse)
+  const [courseChoice, setCourseChoice] = useState<string>('Nutrição e Dietética')
+  const [customCourse, setCustomCourse] = useState<string>('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [error, setError] = useState('')
-  const toggle = <T extends string>(item: T, current: T[], update: (items: T[]) => void) => update(current.includes(item) ? current.filter((entry) => entry !== item) : [...current, item])
-  const setPractice = (value: boolean) => setForm((current) => ({ ...current, practicesSport: value, practicedSports: value ? current.practicedSports.filter((sport) => sport !== 'Outro') : [], frequency: value ? current.frequency : 'Não pratico' }))
+
+  const handleCourseChange = (selected: string) => {
+    setCourseChoice(selected)
+    if (selected === 'Outro') {
+      setForm((cur) => ({ ...cur, course: customCourse.trim() || 'Outro' }))
+    } else {
+      setForm((cur) => ({ ...cur, course: selected }))
+    }
+  }
+
+  const handleCustomCourseChange = (text: string) => {
+    setCustomCourse(text)
+    setForm((cur) => ({ ...cur, course: text.trim() || 'Outro' }))
+  }
+
+  const toggle = <T extends string>(item: T, current: T[], update: (items: T[]) => void) =>
+    update(current.includes(item) ? current.filter((entry) => entry !== item) : [...current, item])
+
+  const setPractice = (value: boolean) =>
+    setForm((current) => ({
+      ...current,
+      practicesSport: value,
+      practicedSports: value ? current.practicedSports.filter((sport) => sport !== 'Outro') : [],
+      frequency: value ? current.frequency : 'Não pratico',
+    }))
+
   const toggleBarrier = (barrier: Barrier) => {
-    if (barrier === 'Nada dificulta') return setForm((current) => ({ ...current, barriers: current.barriers.includes(barrier) ? [] : [barrier] }))
-    setForm((current) => ({ ...current, barriers: current.barriers.includes(barrier) ? current.barriers.filter((entry) => entry !== barrier) : [...current.barriers.filter((entry) => entry !== 'Nada dificulta'), barrier] }))
+    if (barrier === 'Nada dificulta') {
+      return setForm((current) => ({
+        ...current,
+        barriers: current.barriers.includes(barrier) ? [] : [barrier],
+      }))
+    }
+    setForm((current) => ({
+      ...current,
+      barriers: current.barriers.includes(barrier)
+        ? current.barriers.filter((entry) => entry !== barrier)
+        : [...current.barriers.filter((entry) => entry !== 'Nada dificulta'), barrier],
+    }))
   }
+
   async function submit(event: FormEvent) {
-    event.preventDefault(); setError('')
-    if (form.practicesSport && form.practicedSports.length === 0) { setError('Selecione pelo menos uma atividade que você pratica.'); return }
-    if (form.barriers.length === 0) { setError('Selecione uma dificuldade ou marque "Nada dificulta".'); return }
+    event.preventDefault()
+    setError('')
+
+    const finalCourse = courseChoice === 'Outro' ? customCourse.trim() : courseChoice
+    if (!finalCourse) {
+      setError('Por favor, informe o nome do seu curso.')
+      return
+    }
+
+    if (form.practicesSport && form.practicedSports.length === 0) {
+      setError('Selecione pelo menos uma atividade física que você pratica atualmente.')
+      return
+    }
+    if (form.barriers.length === 0) {
+      setError('Selecione ao menos um fator que dificulta sua prática ou marque “Nada dificulta”.')
+      return
+    }
+
     setStatus('sending')
-    try { await sendSurveyResponse(form); setStatus('success') } catch { setStatus('error'); setError('Não foi possível registrar sua resposta. Verifique a conexão e tente novamente.') }
+    try {
+      await sendSurveyResponse({ ...form, course: finalCourse })
+      setStatus('success')
+    } catch {
+      setStatus('error')
+      setError('Não foi possível registrar sua resposta. Verifique a conexão e tente novamente.')
+    }
   }
-  if (status === 'success') return <main className="survey-page"><section className="success-card"><span><CheckCircle2 size={42}/></span><p className="eyebrow">Pesquisa concluída</p><h1>Obrigado por participar!</h1><p>Sua resposta anônima foi registrada e ajudará a construir uma visão mais clara sobre o esporte na escola.</p><button className="primary-button" onClick={onBack}>Ver o painel</button><button className="secondary-button" onClick={() => { setForm(initialResponse); setStatus('idle') }}>Enviar outra resposta</button></section></main>
-  return <main className="survey-page"><button className="back-button" onClick={onBack}><ArrowLeft size={18}/> Voltar ao painel</button><section className="survey-intro"><p className="eyebrow">Pesquisa anônima</p><h1>Mapeamento esportivo</h1><p>Responda de acordo com a sua realidade. Não coletamos nome, CPF ou matrícula. As informações de curso e turma servem exclusivamente para análise estatística por grupo.</p></section><form className="survey-form" onSubmit={submit}>
 
-    <fieldset className="demographic-section"><legend><span>📋</span> Perfil do participante</legend><p className="field-help">Essas informações servem apenas para análise estatística por grupo — não identificam você.</p>
-      <div className="demographic-grid">
-        <label className="demo-field"><span className="demo-label">Curso</span><Select value={form.course} onChange={(course) => setForm({ ...form, course: course as Course })} options={courses}/></label>
-        <label className="demo-field"><span className="demo-label">Série / Turma</span><Select value={form.grade} onChange={(grade) => setForm({ ...form, grade: grade as Grade })} options={grades}/></label>
-        <div className="demo-field"><span className="demo-label">Faixa etária</span><div className="radio-row compact">{ageRanges.map((age) => <Radio key={age} label={age} checked={form.ageRange === age} onChange={() => setForm({ ...form, ageRange: age as AgeRange })}/>)}</div></div>
-        <div className="demo-field"><span className="demo-label">Gênero</span><div className="radio-row compact">{genders.map((g) => <Radio key={g} label={g} checked={form.gender === g} onChange={() => setForm({ ...form, gender: g as Gender })}/>)}</div></div>
+  if (status === 'success') {
+    return (
+      <main className="survey-page">
+        <section className="success-card">
+          <span className="success-icon-badge">
+            <CheckCircle2 size={46} />
+          </span>
+          <p className="eyebrow">Pesquisa registrada</p>
+          <h1>Obrigado por participar!</h1>
+          <p>
+            Sua contribuição anônima foi salva com sucesso e já está integrada aos gráficos e estatísticas
+            do painel da ETE Chico Science.
+          </p>
+          <div className="success-actions">
+            <button className="primary-button" onClick={onBack}>
+              Ver painel atualizado
+            </button>
+            <button
+              className="secondary-button"
+              onClick={() => {
+                setForm(initialResponse)
+                setCourseChoice('Nutrição e Dietética')
+                setCustomCourse('')
+                setStatus('idle')
+              }}
+            >
+              Nova resposta
+            </button>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  return (
+    <main className="survey-page">
+      <div className="survey-header-nav">
+        <button className="back-button" onClick={onBack}>
+          <ArrowLeft size={18} /> Voltar ao painel
+        </button>
+        <span className="survey-security-badge">
+          <ShieldCheck size={15} /> 100% Anônimo & Seguro
+        </span>
       </div>
-    </fieldset>
 
-    <fieldset><legend><span>1</span> Você pratica atualmente algum esporte ou atividade física?</legend><div className="radio-row"><Radio label="Sim" checked={form.practicesSport} onChange={() => setPractice(true)}/><Radio label="Não" checked={!form.practicesSport} onChange={() => setPractice(false)}/></div></fieldset>
-    <fieldset className={!form.practicesSport ? 'muted-field' : ''} disabled={!form.practicesSport}><legend><span>2</span> Qual esporte ou atividade você pratica atualmente?</legend><p className="field-help">Você pode selecionar mais de uma opção.</p><div className="option-grid">{sports.map((sport) => <Checkbox key={sport} label={sport} checked={form.practicedSports.includes(sport)} onChange={() => toggle<Sport>(sport, form.practicedSports, (practicedSports) => setForm({ ...form, practicedSports }))}/>)}</div></fieldset>
-    <fieldset><legend><span>3</span> Com que frequência você pratica?</legend><div className="frequency-list">{frequencies.map((frequency) => <Radio key={frequency} label={frequency} checked={form.frequency === frequency} disabled={!form.practicesSport && frequency !== 'Não pratico'} onChange={() => setForm({ ...form, frequency: frequency as Frequency })}/>)}</div></fieldset>
-    <fieldset><legend><span>4</span> Qual esporte ou atividade você gostaria de praticar?</legend><Select value={form.desiredSport} onChange={(desiredSport) => setForm({ ...form, desiredSport: desiredSport as Sport })} options={sports}/></fieldset>
-    <fieldset><legend><span>5</span> O que dificulta você praticar esportes?</legend><p className="field-help">Você pode selecionar mais de uma opção.</p><div className="option-grid">{barriers.map((barrier) => <Checkbox key={barrier} label={barrier} checked={form.barriers.includes(barrier)} onChange={() => toggleBarrier(barrier)}/>)}</div></fieldset>
-    <fieldset><legend><span>6</span> Qual atividade esportiva você gostaria de ver mais na escola?</legend><Select value={form.desiredAtSchool} onChange={(desiredAtSchool) => setForm({ ...form, desiredAtSchool: desiredAtSchool as Sport })} options={sports}/></fieldset>
-    {error && <p className="form-error" role="alert">{error}</p>}<p className="privacy-note">Ao enviar, você concorda que a resposta seja usada de forma agregada exclusivamente neste projeto de extensão.</p><button className="primary-button submit-button" disabled={status === 'sending'} type="submit">{status === 'sending' ? 'Enviando...' : <>Enviar resposta <Send size={18}/></>}</button>
-  </form></main>
+      <section className="survey-intro">
+        <div className="survey-badge-pill">
+          <Sparkles size={14} /> Questionário Discente
+        </div>
+        <h1>Mapeamento Esportivo</h1>
+        <p className="survey-lead-text">
+          Responda com sinceridade de acordo com a sua realidade escolar e pessoal. 
+          Não coletamos nome, CPF ou matrícula. As informações de curso e turma servem exclusivamente 
+          para análise estatística agregada por grupo.
+        </p>
+      </section>
+
+      <form className="survey-form" onSubmit={submit}>
+        {/* ── CARD 0: PERFIL DEMOGRÁFICO ── */}
+        <section className="survey-step-card demographic-card">
+          <div className="card-header">
+            <span className="step-badge demo">
+              <GraduationCap size={18} />
+            </span>
+            <div>
+              <h2>Perfil do Estudante</h2>
+              <p className="field-help">Informações básicas para agrupamento estatístico na escola.</p>
+            </div>
+          </div>
+
+          <div className="demographic-fields-grid">
+            {/* Curso */}
+            <div className="form-group course-group">
+              <label className="input-label" htmlFor="course-select">
+                Curso Técnico
+              </label>
+              <div className="select-wrapper">
+                <select
+                  id="course-select"
+                  value={courseChoice}
+                  onChange={(e) => handleCourseChange(e.target.value)}
+                  className="modern-select"
+                >
+                  {courses.map((course) => (
+                    <option key={course} value={course}>
+                      {course}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {courseChoice === 'Outro' && (
+                <div className="custom-course-wrapper">
+                  <input
+                    type="text"
+                    className="modern-text-input"
+                    placeholder="Digite o nome do seu curso..."
+                    value={customCourse}
+                    onChange={(e) => handleCustomCourseChange(e.target.value)}
+                    autoFocus
+                    maxLength={80}
+                  />
+                  <small className="field-hint">Ex: Técnico em Enfermagem, Administração, etc.</small>
+                </div>
+              )}
+            </div>
+
+            {/* Série / Turma */}
+            <div className="form-group">
+              <label className="input-label">Série / Turma</label>
+              <div className="pill-group">
+                {grades.map((grade) => (
+                  <button
+                    key={grade}
+                    type="button"
+                    className={`pill-option ${form.grade === grade ? 'active' : ''}`}
+                    onClick={() => setForm({ ...form, grade: grade as Grade })}
+                  >
+                    {form.grade === grade && <Check size={14} />}
+                    {grade}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Faixa Etária */}
+            <div className="form-group">
+              <label className="input-label">Faixa Etária</label>
+              <div className="pill-group">
+                {ageRanges.map((age) => (
+                  <button
+                    key={age}
+                    type="button"
+                    className={`pill-option ${form.ageRange === age ? 'active' : ''}`}
+                    onClick={() => setForm({ ...form, ageRange: age as AgeRange })}
+                  >
+                    {form.ageRange === age && <Check size={14} />}
+                    {age}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Gênero */}
+            <div className="form-group">
+              <label className="input-label">Gênero</label>
+              <div className="pill-group">
+                {genders.map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    className={`pill-option ${form.gender === g ? 'active' : ''}`}
+                    onClick={() => setForm({ ...form, gender: g as Gender })}
+                  >
+                    {form.gender === g && <Check size={14} />}
+                    {g}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── PERGUNTA 1: Prática Atual ── */}
+        <section className="survey-step-card">
+          <div className="card-header">
+            <span className="step-badge">1</span>
+            <div>
+              <h2>Você pratica atualmente algum esporte ou atividade física?</h2>
+              <p className="field-help">Considere qualquer modalidade, academia, corrida, futebol ou dança.</p>
+            </div>
+          </div>
+
+          <div className="choice-cards-row">
+            <button
+              type="button"
+              className={`choice-card ${form.practicesSport ? 'selected' : ''}`}
+              onClick={() => setPractice(true)}
+            >
+              <span className="choice-check-circle">
+                {form.practicesSport && <Check size={16} />}
+              </span>
+              <div className="choice-card-content">
+                <strong>Sim, pratico</strong>
+                <span>Pratico regularmente esportes ou exercícios</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className={`choice-card ${!form.practicesSport ? 'selected' : ''}`}
+              onClick={() => setPractice(false)}
+            >
+              <span className="choice-check-circle">
+                {!form.practicesSport && <Check size={16} />}
+              </span>
+              <div className="choice-card-content">
+                <strong>Não pratico</strong>
+                <span>Atualmente não realizo atividades físicas</span>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        {/* ── PERGUNTA 2: Modalidades Praticadas ── */}
+        <section className={`survey-step-card ${!form.practicesSport ? 'card-disabled' : ''}`}>
+          <div className="card-header">
+            <span className="step-badge">2</span>
+            <div>
+              <h2>Qual esporte ou atividade você pratica atualmente?</h2>
+              <p className="field-help">
+                {form.practicesSport
+                  ? 'Você pode marcar uma ou mais opções que fazem parte da sua rotina.'
+                  : 'Desativado porque você indicou que não pratica esporte atualmente.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="checkbox-grid">
+            {sports.map((sport) => {
+              const checked = form.practicedSports.includes(sport)
+              return (
+                <label
+                  key={sport}
+                  className={`check-card-option ${checked ? 'checked' : ''} ${
+                    !form.practicesSport ? 'disabled' : ''
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    disabled={!form.practicesSport}
+                    onChange={() =>
+                      toggle<Sport>(sport, form.practicedSports, (practicedSports) =>
+                        setForm({ ...form, practicedSports })
+                      )
+                    }
+                  />
+                  <span className="custom-check-box">{checked && <Check size={13} />}</span>
+                  <span className="check-card-label">{sport}</span>
+                </label>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── PERGUNTA 3: Frequência ── */}
+        <section className={`survey-step-card ${!form.practicesSport ? 'card-disabled' : ''}`}>
+          <div className="card-header">
+            <span className="step-badge">3</span>
+            <div>
+              <h2>Com que frequência você costuma praticar?</h2>
+              <p className="field-help">Indique a regularidade semanal média das suas práticas.</p>
+            </div>
+          </div>
+
+          <div className="frequency-cards-grid">
+            {frequencies.map((frequency) => {
+              const isSelected = form.frequency === frequency
+              const isDisabled = !form.practicesSport && frequency !== 'Não pratico'
+              return (
+                <button
+                  key={frequency}
+                  type="button"
+                  disabled={isDisabled}
+                  className={`freq-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                  onClick={() => setForm({ ...form, frequency: frequency as Frequency })}
+                >
+                  <span className="freq-radio-dot">{isSelected && <span className="dot-inner" />}</span>
+                  <span className="freq-label">{frequency}</span>
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── PERGUNTA 4: Desejo Pessoal ── */}
+        <section className="survey-step-card">
+          <div className="card-header">
+            <span className="step-badge">4</span>
+            <div>
+              <h2>Qual esporte ou atividade você gostaria de praticar?</h2>
+              <p className="field-help">Aquela atividade que você tem interesse ou curiosidade de aprender.</p>
+            </div>
+          </div>
+
+          <div className="select-card-wrapper">
+            <select
+              value={form.desiredSport}
+              onChange={(e) => setForm({ ...form, desiredSport: e.target.value as Sport })}
+              className="modern-select full-width"
+            >
+              {sports.map((sport) => (
+                <option key={sport} value={sport}>
+                  {sport}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+
+        {/* ── PERGUNTA 5: Barreiras ── */}
+        <section className="survey-step-card">
+          <div className="card-header">
+            <span className="step-badge">5</span>
+            <div>
+              <h2>O que mais dificulta você praticar esportes?</h2>
+              <p className="field-help">
+                Selecione as principais dificuldades que você enfrenta ou marque “Nada dificulta”.
+              </p>
+            </div>
+          </div>
+
+          <div className="checkbox-grid">
+            {barriers.map((barrier) => {
+              const checked = form.barriers.includes(barrier)
+              return (
+                <label
+                  key={barrier}
+                  className={`check-card-option ${checked ? 'checked' : ''} ${
+                    barrier === 'Nada dificulta' ? 'highlight-option' : ''
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleBarrier(barrier)}
+                  />
+                  <span className="custom-check-box">{checked && <Check size={13} />}</span>
+                  <span className="check-card-label">{barrier}</span>
+                </label>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── PERGUNTA 6: Desejadas na Escola ── */}
+        <section className="survey-step-card">
+          <div className="card-header">
+            <span className="step-badge">6</span>
+            <div>
+              <h2>Qual atividade esportiva você mais gostaria de ver na escola?</h2>
+              <p className="field-help">
+                Modalidade que a ETE Chico Science poderia incentivar em oficinas, torneios ou projetos.
+              </p>
+            </div>
+          </div>
+
+          <div className="select-card-wrapper">
+            <select
+              value={form.desiredAtSchool}
+              onChange={(e) => setForm({ ...form, desiredAtSchool: e.target.value as Sport })}
+              className="modern-select full-width"
+            >
+              {sports.map((sport) => (
+                <option key={sport} value={sport}>
+                  {sport}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+
+        {/* Mensagem de Erro */}
+        {error && (
+          <div className="survey-error-alert" role="alert">
+            <AlertCircle size={20} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Rodapé do Formulário e Envio */}
+        <div className="survey-submit-footer">
+          <p className="privacy-note">
+            Ao enviar, sua resposta anônima é somada às estatísticas coletivas da pesquisa.
+          </p>
+          <button
+            className="primary-button submit-button"
+            disabled={status === 'sending'}
+            type="submit"
+          >
+            {status === 'sending' ? (
+              <>
+                <span className="spinner-icon" /> Gravando resposta...
+              </>
+            ) : (
+              <>
+                Enviar resposta anônima <Send size={18} />
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+    </main>
+  )
 }
-
-function Radio({ label, checked, onChange, disabled = false }: { label: string; checked: boolean; onChange: () => void; disabled?: boolean }) { return <label className="radio-option"><input type="radio" checked={checked} onChange={onChange} disabled={disabled}/><span>{label}</span></label> }
-function Checkbox({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) { return <label className="check-option"><input type="checkbox" checked={checked} onChange={onChange}/><span>{label}</span></label> }
-function Select({ value, onChange, options }: { value: string; onChange: (value: string) => void; options: readonly string[] }) { return <select value={value} onChange={(event) => onChange(event.target.value)}>{options.map((option) => <option key={option}>{option}</option>)}</select> }
