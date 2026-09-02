@@ -27,5 +27,20 @@ export const demoStats: DashboardStats = {
     { name: 'Falta de tempo', value: 18 }, { name: 'Falta de oportunidade na escola', value: 14 },
     { name: 'Falta de equipamentos', value: 10 }, { name: 'Falta de espaço', value: 8 },
   ],
+  courses: [
+    { name: 'Desenvolvimento de Sistemas', value: 18 }, { name: 'Redes de Computadores', value: 12 },
+    { name: 'Administração', value: 9 }, { name: 'Outro', value: 3 },
+  ],
+  grades: [
+    { name: '1º Ano', value: 16 }, { name: '2º Ano', value: 14 },
+    { name: '3º Ano', value: 10 }, { name: 'Módulo Subsequente', value: 2 },
+  ],
+  ageRanges: [
+    { name: '16 a 17 anos', value: 22 }, { name: '14 a 15 anos', value: 12 },
+    { name: '18 anos ou mais', value: 8 },
+  ],
+  genders: [
+    { name: 'Masculino', value: 23 }, { name: 'Feminino', value: 15 },
+    { name: 'Outro', value: 2 }, { name: 'Prefiro não informar', value: 2 },
+  ],
 }
-

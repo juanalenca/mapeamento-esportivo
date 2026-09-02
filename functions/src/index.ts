@@ -8,6 +8,10 @@ const statsRef = db.collection('dashboardStats').doc('current')
 
 type CountItem = { name: string; value: number }
 type ResponseData = {
+  course: string
+  grade: string
+  ageRange: string
+  gender: string
   practicesSport: boolean
   practicedSports: string[]
   frequency: string
@@ -31,6 +35,10 @@ function currentStats(data?: DocumentData) {
     desiredSports: (data?.desiredSports ?? []) as CountItem[],
     desiredAtSchool: (data?.desiredAtSchool ?? []) as CountItem[],
     barriers: (data?.barriers ?? []) as CountItem[],
+    courses: (data?.courses ?? []) as CountItem[],
+    grades: (data?.grades ?? []) as CountItem[],
+    ageRanges: (data?.ageRanges ?? []) as CountItem[],
+    genders: (data?.genders ?? []) as CountItem[],
   }
 }
 
@@ -49,8 +57,11 @@ export const updateDashboardStats = onDocumentCreated('surveyResponses/{response
       desiredSports: increment(current.desiredSports, [response.desiredSport]),
       desiredAtSchool: increment(current.desiredAtSchool, response.desiredAtSchool ? [response.desiredAtSchool] : []),
       barriers: increment(current.barriers, response.barriers),
+      courses: increment(current.courses, response.course ? [response.course] : []),
+      grades: increment(current.grades, response.grade ? [response.grade] : []),
+      ageRanges: increment(current.ageRanges, response.ageRange ? [response.ageRange] : []),
+      genders: increment(current.genders, response.gender ? [response.gender] : []),
       updatedAt: new Date(),
     }, { merge: true })
   })
 })
-

@@ -17,9 +17,25 @@ service cloud.firestore {
         && value.size() > 0 && value.size() <= 9
         && (!value.hasAny(['Nada dificulta']) || value.size() == 1);
     }
+    function validCourse(value) {
+      return value in ['Desenvolvimento de Sistemas', 'Redes de Computadores', 'Administração', 'Outro'];
+    }
+    function validGrade(value) {
+      return value in ['1º Ano', '2º Ano', '3º Ano', 'Módulo Subsequente'];
+    }
+    function validAgeRange(value) {
+      return value in ['14 a 15 anos', '16 a 17 anos', '18 anos ou mais'];
+    }
+    function validGender(value) {
+      return value in ['Feminino', 'Masculino', 'Outro', 'Prefiro não informar'];
+    }
     function validResponse() {
-      return request.resource.data.keys().hasOnly(['practicesSport', 'practicedSports', 'frequency', 'desiredSport', 'barriers', 'desiredAtSchool', 'createdAt'])
-        && request.resource.data.keys().hasAll(['practicesSport', 'practicedSports', 'frequency', 'desiredSport', 'barriers', 'desiredAtSchool', 'createdAt'])
+      return request.resource.data.keys().hasOnly(['course', 'grade', 'ageRange', 'gender', 'practicesSport', 'practicedSports', 'frequency', 'desiredSport', 'barriers', 'desiredAtSchool', 'createdAt'])
+        && request.resource.data.keys().hasAll(['course', 'grade', 'ageRange', 'gender', 'practicesSport', 'practicedSports', 'frequency', 'desiredSport', 'barriers', 'desiredAtSchool', 'createdAt'])
+        && validCourse(request.resource.data.course)
+        && validGrade(request.resource.data.grade)
+        && validAgeRange(request.resource.data.ageRange)
+        && validGender(request.resource.data.gender)
         && request.resource.data.practicesSport is bool
         && request.resource.data.practicedSports is list
         && request.resource.data.practicedSports.size() <= 10

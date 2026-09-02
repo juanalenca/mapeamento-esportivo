@@ -13,11 +13,35 @@ export const barriers = [
   'Falta de companhia', 'Falta de oportunidade na escola', 'Falta de interesse', 'Outro', 'Nada dificulta',
 ] as const
 
+export const courses = [
+  'Desenvolvimento de Sistemas', 'Redes de Computadores', 'Administração', 'Outro',
+] as const
+
+export const grades = [
+  '1º Ano', '2º Ano', '3º Ano', 'Módulo Subsequente',
+] as const
+
+export const ageRanges = [
+  '14 a 15 anos', '16 a 17 anos', '18 anos ou mais',
+] as const
+
+export const genders = [
+  'Feminino', 'Masculino', 'Outro', 'Prefiro não informar',
+] as const
+
 export type Sport = (typeof sports)[number]
 export type Frequency = (typeof frequencies)[number]
 export type Barrier = (typeof barriers)[number]
+export type Course = (typeof courses)[number]
+export type Grade = (typeof grades)[number]
+export type AgeRange = (typeof ageRanges)[number]
+export type Gender = (typeof genders)[number]
 
 export interface SurveyResponse {
+  course: Course
+  grade: Grade
+  ageRange: AgeRange
+  gender: Gender
   practicesSport: boolean
   practicedSports: Sport[]
   frequency: Frequency
@@ -37,6 +61,9 @@ export interface DashboardStats {
   desiredSports: CountItem[]
   desiredAtSchool?: CountItem[]
   barriers: CountItem[]
+  courses?: CountItem[]
+  grades?: CountItem[]
+  ageRanges?: CountItem[]
+  genders?: CountItem[]
   updatedAt?: unknown
 }
-

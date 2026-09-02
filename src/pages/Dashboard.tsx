@@ -92,6 +92,16 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <article className="stat-card"><span className="stat-icon blue"><ClipboardList size={21}/></span><div><p>Não praticam</p><strong>{percent(stats.practices.no)}%</strong><small>{stats.practices.no} estudantes</small></div></article>
           <article className="stat-card"><span className="stat-icon coral"><BarChart3 size={21}/></span><div><p>Principal interesse</p><strong>{stats.desiredSports[0]?.name ?? '—'}</strong><small>{stats.desiredSports[0]?.value ?? 0} estudantes</small></div></article>
         </div>
+
+        <div className="section-heading sub-heading"><div><p className="eyebrow">Perfil demográfico</p><h2>Quem são os participantes</h2></div></div>
+        <div className="chart-grid">
+          <ChartCard title="Distribuição por curso" description="Curso técnico dos participantes" data={stats.courses?.length ? stats.courses : (demoStats.courses ?? [])} />
+          <ChartCard title="Distribuição por gênero" description="Gênero informado pelos participantes" data={stats.genders?.length ? stats.genders : (demoStats.genders ?? [])} />
+          <ChartCard title="Distribuição por série" description="Série/turma dos participantes" data={stats.grades?.length ? stats.grades : (demoStats.grades ?? [])} />
+          <ChartCard title="Distribuição por faixa etária" description="Faixa de idade dos participantes" data={stats.ageRanges?.length ? stats.ageRanges : (demoStats.ageRanges ?? [])} />
+        </div>
+
+        <div className="section-heading sub-heading"><div><p className="eyebrow">Hábitos e interesses</p><h2>Dados esportivos</h2></div></div>
         <div className="chart-grid">
           <ChartCard title="Modalidades praticadas" description="Atividades realizadas atualmente" data={stats.practicedSports?.length ? stats.practicedSports : demoStats.practicedSports} />
           <ChartCard title="Frequência de prática" description="Quantas vezes por semana praticam" data={stats.frequencies?.length ? stats.frequencies : (demoStats.frequencies ?? [])} />

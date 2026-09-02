@@ -777,6 +777,63 @@ select:focus-visible {
   margin-top: 12px;
 }
 
+/* ── Demographic Profile Section ── */
+.demographic-section {
+  background: var(--color-primary-subtle);
+  border: 1px solid #d8eae5;
+  border-radius: var(--radius-md);
+  padding: 24px 24px 20px !important;
+  margin-bottom: 16px;
+}
+
+.demographic-section legend {
+  font-size: 1.12rem;
+  margin-bottom: 4px;
+}
+
+.demographic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 28px;
+  margin-top: 10px;
+}
+
+.demo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demo-label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: #3a524e;
+}
+
+.demo-field select {
+  margin-top: 0 !important;
+  width: 100% !important;
+}
+
+.radio-row.compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.radio-row.compact .radio-option {
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  min-height: 38px;
+}
+
+.sub-heading {
+  margin-top: 40px;
+}
+
 .survey-form fieldset {
   border: 0;
   padding: clamp(20px, 3.5vw, 28px) 0;
@@ -1220,6 +1277,15 @@ select:focus-visible {
   .success-card .secondary-button {
     width: 100%;
     margin: 6px 0;
+  }
+
+  .demographic-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .radio-row.compact {
+    flex-direction: column;
+    gap: 8px;
   }
 
   .footer {

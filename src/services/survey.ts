@@ -30,6 +30,10 @@ function getLocalStats(): DashboardStats | null {
         barriers: parsed.barriers?.length ? parsed.barriers : demoStats.barriers,
         frequencies: parsed.frequencies?.length ? parsed.frequencies : (demoStats.frequencies ?? []),
         desiredAtSchool: parsed.desiredAtSchool?.length ? parsed.desiredAtSchool : (demoStats.desiredAtSchool ?? []),
+        courses: parsed.courses?.length ? parsed.courses : (demoStats.courses ?? []),
+        grades: parsed.grades?.length ? parsed.grades : (demoStats.grades ?? []),
+        ageRanges: parsed.ageRanges?.length ? parsed.ageRanges : (demoStats.ageRanges ?? []),
+        genders: parsed.genders?.length ? parsed.genders : (demoStats.genders ?? []),
       }
     }
   } catch {
@@ -50,6 +54,10 @@ function updateLocalStats(response: SurveyResponse): DashboardStats {
     desiredSports: increment(base.desiredSports, [response.desiredSport]),
     desiredAtSchool: increment(base.desiredAtSchool ?? demoStats.desiredAtSchool ?? [], response.desiredAtSchool ? [response.desiredAtSchool] : []),
     barriers: increment(base.barriers, response.barriers),
+    courses: increment(base.courses ?? demoStats.courses ?? [], response.course ? [response.course] : []),
+    grades: increment(base.grades ?? demoStats.grades ?? [], response.grade ? [response.grade] : []),
+    ageRanges: increment(base.ageRanges ?? demoStats.ageRanges ?? [], response.ageRange ? [response.ageRange] : []),
+    genders: increment(base.genders ?? demoStats.genders ?? [], response.gender ? [response.gender] : []),
     updatedAt: new Date().toISOString(),
   }
   try {
@@ -83,6 +91,10 @@ export async function sendSurveyResponse(response: SurveyResponse) {
               desiredSports: [],
               desiredAtSchool: [],
               barriers: [],
+              courses: [],
+              grades: [],
+              ageRanges: [],
+              genders: [],
             }
 
         const updated: DashboardStats = {
@@ -95,6 +107,10 @@ export async function sendSurveyResponse(response: SurveyResponse) {
           desiredSports: increment(base.desiredSports || [], response.desiredSport ? [response.desiredSport] : []),
           desiredAtSchool: increment(base.desiredAtSchool || [], response.desiredAtSchool ? [response.desiredAtSchool] : []),
           barriers: increment(base.barriers || [], response.barriers),
+          courses: increment(base.courses || [], response.course ? [response.course] : []),
+          grades: increment(base.grades || [], response.grade ? [response.grade] : []),
+          ageRanges: increment(base.ageRanges || [], response.ageRange ? [response.ageRange] : []),
+          genders: increment(base.genders || [], response.gender ? [response.gender] : []),
           updatedAt: new Date().toISOString(),
         }
 
@@ -126,6 +142,10 @@ export async function getDashboardStats(): Promise<{ stats: DashboardStats; isDe
           barriers: data.barriers?.length ? data.barriers : [],
           frequencies: data.frequencies?.length ? data.frequencies : [],
           desiredAtSchool: data.desiredAtSchool?.length ? data.desiredAtSchool : [],
+          courses: data.courses?.length ? data.courses : [],
+          grades: data.grades?.length ? data.grades : [],
+          ageRanges: data.ageRanges?.length ? data.ageRanges : [],
+          genders: data.genders?.length ? data.genders : [],
         }
         return {
           stats: realStats,

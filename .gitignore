@@ -17,3 +17,4 @@ orientacoes.txt
 *.docx
 scripts/serviceAccountKey.json
 scripts/backups/
+firebase.exe
