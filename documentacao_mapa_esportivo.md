@@ -1,7 +1,7 @@
 # Especificação de Requisitos e Modelagem de Dados — Mapa Esportivo
 
 **Sistema de Levantamento e Diagnóstico de Perfil Esportivo Escolar**  
-**Instituição:** Escola Técnica Estadual Chico Science (ETE Chico Science — Olinda/PE)  
+**Instituição:** Colégio EREM Santa Ana (Escola de Referência em Ensino Médio Santa Ana — Olinda/PE)  
 **Projeto:** Engenharia de Software / Análise de Sistemas / Banco de Dados  
 **Ano/Período:** 2026.2  
 
@@ -10,23 +10,22 @@
 ## 1. O que é o Projeto
 
 ### 1.1. Definição do Sistema
-O **Mapa Esportivo** é uma plataforma web institucional de levantamento censitário e diagnóstico analítico sobre a prática de atividades físicas, interesses esportivos e barreiras enfrentadas pelos estudantes da **Escola Técnica Estadual Chico Science (ETE Chico Science)**, localizada em Olinda/PE.
+O **Mapa Esportivo** é uma plataforma web de levantamento censitário e diagnóstico analítico sobre a prática de atividades físicas, interesses esportivos e barreiras enfrentadas pelos estudantes do **Colégio EREM Santa Ana (Escola de Referência em Ensino Médio Santa Ana)**, localizada em Olinda/PE.
 
 ### 1.2. Contexto Institucional
-A ETE Chico Science é uma escola pública estadual de Educação Profissional e Tecnológica focada prioritariamente na área de saúde, oferecendo cursos técnicos integrados ao Ensino Médio:
-- **Técnico em Nutrição e Dietética**
-- **Técnico em Farmácia**
-- **Técnico em Enfermagem**
-- Possibilidade de acolhimento de outras turmas ou cursos correlatos mediante identificação textual direta no sistema.
+O Colégio EREM Santa Ana atende centenas de jovens no Ensino Médio Integral e propedêutico/técnico. O diagnóstico abrange os três anos do Ensino Médio:
+- **1º Ano**
+- **2º Ano**
+- **3º Ano**
 
-As turmas contempladas no diagnóstico correspondem aos três anos do Ensino Médio Integrado (**1º Ano**, **2º Ano** e **3º Ano**).
+No campo de identificação de curso/itinerário, o sistema disponibiliza opções ágeis com os cursos técnicos de referência em saúde da rede estadual (`Nutrição e Dietética`, `Farmácia`, `Enfermagem`), além da opção de digitação livre (`Outro`), permitindo o acolhimento de qualquer itinerário formativo ou turma da escola.
 
 ### 1.3. Problema que o Projeto Resolve
 Tradicionalmente, a elaboração do plano pedagógico de Educação Física, a oferta de escolinhas esportivas, oficinas extracurriculares e os Jogos Escolares ocorrem sem uma base estatística representativa. Isso acarreta:
-1. **Descompasso de modalidades**: oferta pautada em tradição (apenas futsal/vôlei) sem aferir demandas reais como dança, artes marciais, musculação ou calistenia;
-2. **Falta de diagnóstico de barreiras**: desconhecimento dos reais fatores que limitam os discentes (falta de tempo, espaço escolar inadequado, custos, falta de equipamentos ou companhia);
-3. **Inviabilidade de pesquisas em papel**: perda de dados, custo de impressão e demora na tabulação manual;
-4. **Viés por falta de privacidade**: alunos sedentários evitam preencher questionários que exijam nome ou matrícula.
+1. **Descompasso de modalidades**: oferta concentrada exclusivamente em esportes tradicionais (como futsal), sem aferir demandas reais como dança, artes marciais, vôlei, basquete, musculação ou calistenia;
+2. **Falta de diagnóstico de barreiras**: desconhecimento dos fatores que limitam os estudantes (falta de tempo, espaço escolar reduzido, custo de equipamentos ou falta de oportunidade na escola);
+3. **Inviabilidade de pesquisas em papel**: perda de questionários impressos, custos de fotocópias e demora excessiva na tabulação manual;
+4. **Viés por falta de privacidade**: alunos sedentários ou com dificuldades evitam participar de questionários nominais.
 
 O Mapa Esportivo provê um **questionário discente digital desidentificado (100% anônimo)** e um **painel analítico (dashboard) em tempo real** para orientar gestores e professores com base em evidências estatísticas.
 
@@ -36,22 +35,22 @@ O Mapa Esportivo provê um **questionário discente digital desidentificado (100
 
 | Código | Nome | Descrição Objetiva |
 |---|---|---|
-| **RF01** | Coleta de Perfil Demográfico | O sistema deve coletar do estudante: Curso Técnico, Série/Turma, Faixa Etária e Gênero, sem exigir identificadores pessoais (nome, CPF, matrícula). |
-| **RF02** | Seleção e Digitação de Curso | O sistema deve disponibilizar como primeiras opções os cursos oficiais da instituição (`Nutrição e Dietética`, `Farmácia`, `Enfermagem`), a opção `Outro` e, caso `Outro` seja selecionado, exibir um campo de texto obrigatório para digitação livre do curso (2 a 80 caracteres). |
-| **RF03** | Seleção de Série / Turma | O sistema deve restringir a seleção de série/turma exclusivamente às opções do Ensino Médio Integrado: `1º Ano`, `2º Ano` e `3º Ano`. |
+| **RF01** | Coleta de Perfil Demográfico | O sistema deve coletar do estudante: Curso Técnico/Itinerário, Série/Turma, Faixa Etária e Gênero, sem exigir identificadores pessoais (nome, CPF, matrícula). |
+| **RF02** | Seleção e Digitação de Curso | O sistema deve disponibilizar como primeiras opções cursos da rede (`Nutrição e Dietética`, `Farmácia`, `Enfermagem`), a opção `Outro` e, caso `Outro` seja selecionado, exibir um campo de texto obrigatório para digitação livre do curso/itinerário (2 a 80 caracteres). |
+| **RF03** | Seleção de Série / Turma | O sistema deve restringir a seleção de série/turma exclusivamente às opções do Ensino Médio: `1º Ano`, `2º Ano` e `3º Ano`. |
 | **RF04** | Coleta de Prática Esportiva Atual | O sistema deve permitir ao estudante declarar objetivamente se pratica atualmente alguma atividade física ("Sim, pratico" ou "Não pratico"). |
 | **RF05** | Seleção de Modalidades Praticadas | O sistema deve permitir ao estudante marcar uma ou múltiplas modalidades que pratica (`Futebol`, `Vôlei`, `Futsal`, `Basquete`, `Corrida/caminhada`, `Ciclismo`, `Musculação/academia`, `Dança`, `Artes marciais`, `Outro`). |
 | **RF06** | Coleta de Frequência Semanal | O sistema deve registrar a regularidade semanal de prática (`Todos os dias`, `4–6 vezes por semana`, `2–3 vezes por semana`, `1 vez por semana`, `Menos de 1 vez por semana` ou `Não pratico`). |
 | **RF07** | Condicionalidade de Prática | Caso o estudante informe que não pratica atividade física (RF04 = falso), o sistema deve desativar as perguntas de modalidades e fixar a frequência em `Não pratico`. |
 | **RF08** | Coleta de Interesse Pessoal | O sistema deve permitir ao estudante selecionar a modalidade que ele mais gostaria de praticar ou aprender. |
 | **RF09** | Coleta de Barreiras e Dificuldades | O sistema deve permitir a seleção múltipla de fatores limitantes (`Falta de tempo`, `Falta de espaço`, `Falta de equipamentos`, `Falta de dinheiro`, `Falta de companhia`, `Falta de oportunidade na escola`, `Falta de interesse`, `Outro`) ou a opção exclusiva `Nada dificulta`. |
-| **RF10** | Coleta de Demanda Esportiva Escolar | O sistema deve permitir ao estudante indicar qual modalidade ele mais gostaria de ver oferecida no espaço ou projetos da ETE Chico Science. |
+| **RF10** | Coleta de Demanda Esportiva Escolar | O sistema deve permitir ao estudante indicar qual modalidade ele mais gostaria de ver oferecida no espaço ou projetos do Colégio EREM Santa Ana. |
 | **RF11** | Submissão e Gravação Atômica | O sistema deve validar e persistir a resposta em operação atômica, refletindo a atualização imediata nos indicadores agregados do painel. |
 | **RF12** | Painel de Indicadores Gerais (KPIs) | O painel deve exibir em cards: Total de Respostas, Taxa e Contagem de Praticantes, Taxa e Contagem de Não Praticantes e Modalidade com Maior Interesse. |
 | **RF13** | Gráficos de Distribuição Demográfica | O painel deve apresentar gráficos em barras horizontais detalhando a distribuição de respondentes por: Curso, Gênero, Série e Faixa Etária. |
 | **RF14** | Gráficos de Diagnóstico Esportivo | O painel deve apresentar gráficos analíticos de: Modalidades Mais Praticadas, Frequência Semanal, Interesses Pessoais, Demandas para a Escola e Principais Dificuldades. |
 | **RF15** | Gráfico de Adesão Geral | O painel deve apresentar barra comparativa de progresso destacando a proporção de estudantes ativos versus não praticantes. |
-| **RF16** | Estado Vazio Amigável | Quando não houver respostas gravadas no banco de dados, o sistema deve exibir uma tela inicial limpa com convite à participação e pré-visualização das dimensões analisadas. |
+| **RF16** | Geração e Distribuição por QR Codes | O sistema deve disponibilizar QR Codes dedicados para acesso direto ao Questionário, ao Painel e à página Institucional, permitindo projeção em sala de aula e impressão em murais. |
 
 ---
 
@@ -62,11 +61,10 @@ O Mapa Esportivo provê um **questionário discente digital desidentificado (100
 | **RNF01** | Responsividade Completa | A interface deve ser 100% responsiva (Mobile-First), adaptando-se sem rolagem horizontal ou quebra de elementos em telas com largura a partir de 320px (smartphones compactos) até 1920px+ (desktops). |
 | **RNF02** | Privacidade e Anonimato (LGPD) | O sistema deve operar sob coleta estritamente desidentificada, sem registrar nome, CPF, e-mail, telefone, matrícula ou endereço IP do estudante, garantindo total conformidade com a Lei Geral de Proteção de Dados. |
 | **RNF03** | Usabilidade e Touch Targets | Todos os botões, checkboxes e seletores devem possuir altura mínima de toque de 44px a 48px em dispositivos móveis, com feedback tátil e visual de seleção imediata. |
-| **RNF04** | Desempenho e Tempo de Carregamento | O tempo de carregamento da página (First Contentful Paint) deve ser inferior a 1,5 segundos em conexões 4G escolares, e o processamento de envio deve ocorrer em menos de 800ms. |
-| **RNF05** | Consistência e Atomicidade Transacional | A submissão da pesquisa e o incremento dos contadores de estatísticas devem ser executados em transação única atômica (ACID), evitando contagens divergentes ou inconsistências de concorrência. |
+| **RNF04** | Desempenho e Tempo de Carregamento | O tempo de carregamento da página (First Contentful Paint) deve ser inferior a 1,5 segundos em conexões móveis escolares, e o processamento de envio deve ocorrer em menos de 800ms. |
+| **RNF05** | Consistência e Integridade Relacional | O modelo relacional de banco de dados deve assegurar integridade estrita por meio de chaves primárias, chaves estrangeiras (`ON DELETE RESTRICT/CASCADE`) e constraints `CHECK` declarativas. |
 | **RNF06** | Acessibilidade Visual | A paleta de cores deve atender aos critérios de contraste WCAG AA/AAA, associando textos informativos, ícones semânticos e rótulos acessíveis para leitores de tela (`aria-label`, `sr-only`). |
-| **RNF07** | Segurança de Regras no Servidor | O acesso aos dados e a gravação de documentos no banco devem ser validados por regras de segurança no servidor (`firestore.rules` ou constraints SQL), rejeitando campos extras ou valores fora dos domínios aceitos. |
-| **RNF08** | Disponibilidade e Resiliência | A aplicação deve ser servida via CDN global de alta disponibilidade (Firebase Hosting com HTTPS obrigatório e TLS 1.3), suportando picos de acessos simultâneos nas salas de aula. |
+| **RNF07** | Disponibilidade e Resiliência | A aplicação pública deve ser hospedada em infraestrutura global de alta disponibilidade com conexão criptografada (HTTPS e TLS 1.3 obrigatórios). |
 
 ---
 
@@ -74,160 +72,23 @@ O Mapa Esportivo provê um **questionário discente digital desidentificado (100
 
 | Código | Regra | Detalhamento e Implementação |
 |---|---|---|
-| **RN01** | **Validação de Curso Técnico** | O curso informado deve ser um dos cursos de saúde oficiais (`Nutrição e Dietética`, `Farmácia`, `Enfermagem`) ou, se for selecionada a opção `Outro`, deve ser fornecido um texto com no mínimo 2 e no máximo 80 caracteres. |
+| **RN01** | **Validação de Curso** | O curso informado deve ser um dos cursos sugeridos (`Nutrição e Dietética`, `Farmácia`, `Enfermagem`) ou, se for selecionada a opção `Outro`, deve ser fornecido um texto com no mínimo 2 e no máximo 80 caracteres. |
 | **RN02** | **Restrição de Série/Turma** | A série do estudante deve pertencer exclusivamente ao conjunto: `['1º Ano', '2º Ano', '3º Ano']`. Nenhuma outra série ou módulo é aceita. |
 | **RN03** | **Domínio de Idade e Gênero** | A faixa etária é restrita a `['14 a 15 anos', '16 a 17 anos', '18 anos ou mais']`. O gênero deve pertencer a `['Feminino', 'Masculino', 'Outro', 'Prefiro não informar']`. |
-| **RN04** | **Lógica Condicional de Prática** | Se o aluno responder que não pratica atividades (`practicesSport = false`), a lista de modalidades praticadas deve ser gravada vazia (`[]`) e a frequência deve ser compulsoriamente registrada como `'Não pratico'`. |
+| **RN04** | **Lógica Condicional de Prática** | Se o aluno responder que não pratica atividades (`pratica_esporte = false`), a lista de modalidades praticadas deve ser gravada vazia e a frequência deve ser compulsoriamente registrada como `'Não pratico'`. |
 | **RN05** | **Exclusividade da Barreira "Nada dificulta"** | A opção `'Nada dificulta'` é mutuamente exclusiva. Não é permitido combiná-la com qualquer outra dificuldade. Se selecionada, todas as outras barreiras são desmarcadas; se outra for marcada, ela é desfeita. |
 | **RN06** | **Obrigatoriedade Mínima de Preenchimento** | O formulário só pode ser enviado se: (a) Curso for válido; (b) Turma, Idade e Gênero forem selecionados; (c) Caso pratique esportes, pelo menos uma modalidade atual for assinalada; (d) Pelo menos uma barreira (ou "Nada dificulta") for assinalada. |
-| **RN07** | **Atomicidade do Censo** | Toda nova resposta submetida deve somar imediatamente (+1) ao total de respostas e incrementar os respectivos contadores demográficos e esportivos no documento de estatísticas via transação direta. |
-| **RN08** | **Imutabilidade e Não Exclusão Pública** | O cliente web público não possui privilégios de alteração (`update`) nem de exclusão (`delete`) sobre as respostas salvas, impedindo fraudes ou manipulação dos resultados coletados. |
+| **RN07** | **Atomicidade do Censo** | Toda nova resposta submetida deve incrementar em tempo real o total de respostas e os respectivos contadores demográficos e esportivos sem risco de condições de corrida (*race conditions*). |
+| **RN08** | **Imutabilidade e Não Exclusão Pública** | O cliente web público não possui privilégios de alteração (`UPDATE`) nem de exclusão (`DELETE`) sobre as respostas salvas, impedindo manipulação ou fraude nos resultados coletados. |
 
 ---
 
-## 5. Detalhamento do Banco de Dados
+## 5. Detalhamento do Banco de Dados Relacional (PostgreSQL 16+)
 
-O projeto contempla duas implementações técnicas complementares:
-1. **Banco de Dados em Produção**: **Firebase Cloud Firestore (NoSQL Document Store)** — ambiente ativo e escalável em produção.
-2. **Modelo Relacional Acadêmico**: **PostgreSQL 16+ (SQL Relacional em 3FN)** — modelagem teórica e relacional normalizada com DDL completo.
+O banco de dados relacional foi modelado seguindo rigorosamente a metodologia relacional e a **Terceira Forma Normal (3FN)**, garantindo integridade referencial estrita, ausência de redundâncias anômalas e suporte completo a consultas analíticas consolidadas.
 
----
+### 5.1. Diagrama Entidade-Relacionamento (DER / Mermaid)
 
-### 5.1. Banco de Dados em Produção (Firebase Cloud Firestore)
-
-#### Coleção 1: `surveyResponses`
-Armazena cada registro individual de participação do estudante de forma desidentificada.
-
-- **Caminho:** `/surveyResponses/{responseId}`
-- **Estrutura do Documento:**
-```json
-{
-  "course": "Nutrição e Dietética",
-  "grade": "1º Ano",
-  "ageRange": "16 a 17 anos",
-  "gender": "Feminino",
-  "practicesSport": true,
-  "practicedSports": ["Vôlei", "Corrida/caminhada"],
-  "frequency": "2–3 vezes por semana",
-  "desiredSport": "Futsal",
-  "barriers": ["Falta de tempo", "Falta de espaço"],
-  "desiredAtSchool": "Vôlei",
-  "createdAt": "TIMESTAMP"
-}
-```
-
-#### Coleção 2: `dashboardStats`
-Armazena o documento consolidado de estatísticas em tempo real, alimentando o dashboard instantaneamente sem exigir varredura completa da coleção a cada visita.
-
-- **Caminho:** `/dashboardStats/current`
-- **Estrutura do Documento:**
-```json
-{
-  "totalResponses": 42,
-  "practices": { "yes": 29, "no": 13 },
-  "courses": [
-    { "name": "Nutrição e Dietética", "value": 18 },
-    { "name": "Farmácia", "value": 13 },
-    { "name": "Enfermagem", "value": 8 },
-    { "name": "Outro", "value": 3 }
-  ],
-  "grades": [
-    { "name": "1º Ano", "value": 18 },
-    { "name": "2º Ano", "value": 14 },
-    { "name": "3º Ano", "value": 10 }
-  ],
-  "ageRanges": [
-    { "name": "16 a 17 anos", "value": 22 },
-    { "name": "14 a 15 anos", "value": 12 },
-    { "name": "18 anos ou mais", "value": 8 }
-  ],
-  "genders": [
-    { "name": "Feminino", "value": 23 },
-    { "name": "Masculino", "value": 15 },
-    { "name": "Outro", "value": 2 },
-    { "name": "Prefiro não informar", "value": 2 }
-  ],
-  "practicedSports": [
-    { "name": "Futebol", "value": 15 },
-    { "name": "Vôlei", "value": 8 }
-  ],
-  "frequencies": [
-    { "name": "2–3 vezes por semana", "value": 14 },
-    { "name": "Não pratico", "value": 13 }
-  ],
-  "desiredSports": [
-    { "name": "Vôlei", "value": 12 },
-    { "name": "Futsal", "value": 9 }
-  ],
-  "desiredAtSchool": [
-    { "name": "Futsal", "value": 14 },
-    { "name": "Vôlei", "value": 11 }
-  ],
-  "barriers": [
-    { "name": "Falta de tempo", "value": 18 },
-    { "name": "Falta de espaço", "value": 8 }
-  ],
-  "updatedAt": "TIMESTAMP"
-}
-```
-
-#### Regras de Validação de Segurança (`firestore.rules`)
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function validCourse(value) {
-      return value is string && value.size() >= 2 && value.size() <= 80;
-    }
-    function validGrade(value) {
-      return value in ['1º Ano', '2º Ano', '3º Ano'];
-    }
-    function validAgeRange(value) {
-      return value in ['14 a 15 anos', '16 a 17 anos', '18 anos ou mais'];
-    }
-    function validGender(value) {
-      return value in ['Feminino', 'Masculino', 'Outro', 'Prefiro não informar'];
-    }
-    function validBarriers(value) {
-      return value.hasOnly(['Falta de tempo', 'Falta de espaço', 'Falta de equipamentos', 'Falta de dinheiro', 'Falta de companhia', 'Falta de oportunidade na escola', 'Falta de interesse', 'Outro', 'Nada dificulta'])
-        && value.size() > 0 && value.size() <= 9
-        && (!value.hasAny(['Nada dificulta']) || value.size() == 1);
-    }
-    function validResponse() {
-      return request.resource.data.keys().hasOnly(['course', 'grade', 'ageRange', 'gender', 'practicesSport', 'practicedSports', 'frequency', 'desiredSport', 'barriers', 'desiredAtSchool', 'createdAt'])
-        && request.resource.data.keys().hasAll(['course', 'grade', 'ageRange', 'gender', 'practicesSport', 'practicedSports', 'frequency', 'desiredSport', 'barriers', 'desiredAtSchool', 'createdAt'])
-        && validCourse(request.resource.data.course)
-        && validGrade(request.resource.data.grade)
-        && validAgeRange(request.resource.data.ageRange)
-        && validGender(request.resource.data.gender)
-        && request.resource.data.practicesSport is bool
-        && request.resource.data.practicedSports is list
-        && request.resource.data.frequency is string
-        && request.resource.data.desiredSport is string
-        && validBarriers(request.resource.data.barriers)
-        && request.resource.data.desiredAtSchool is string
-        && request.resource.data.createdAt == request.time;
-    }
-
-    match /surveyResponses/{responseId} {
-      allow read: if false;
-      allow create: if validResponse();
-      allow update, delete: if false;
-    }
-
-    match /dashboardStats/{docId} {
-      allow read: if true;
-      allow write: if true;
-    }
-  }
-}
-```
-
----
-
-### 5.2. Modelo Relacional Normalizado (PostgreSQL 16+)
-
-#### Diagrama Lógico Relacional (Mermaid)
 ```mermaid
 erDiagram
     CURSO ||--o{ PARTICIPACAO : "informa"
@@ -236,7 +97,7 @@ erDiagram
 
     CURSO {
         int id_curso PK
-        varchar nome
+        varchar nome UK
         varchar sigla UK
         boolean ativo
     }
@@ -268,11 +129,63 @@ erDiagram
     }
 ```
 
-#### Script SQL DDL Completo (PostgreSQL 16+)
+---
+
+### 5.2. Dicionário de Dados das Tabelas Relacionais
+
+#### Tabela 1: `curso`
+Armazena os cursos e opções disponíveis na instituição.
+
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_curso` | `SERIAL` | `PRIMARY KEY` | Identificador único autoincrementado do curso. |
+| `nome` | `VARCHAR(120)` | `NOT NULL, UNIQUE` | Nome oficial do curso (ex.: *Nutrição e Dietética*, *Farmácia*, *Outro*). |
+| `sigla` | `VARCHAR(15)` | `NOT NULL, UNIQUE` | Sigla curta de referência (ex.: `NUTRI`, `FARM`, `OUTRO`). |
+| `ativo` | `BOOLEAN` | `NOT NULL, DEFAULT TRUE` | Indicador de curso ativo para preenchimento. |
+
+#### Tabela 2: `participacao`
+Registra a sessão de resposta do estudante do Colégio EREM Santa Ana, assegurando o anonimato discente e consolidando o perfil demográfico e os hábitos centrais.
+
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_participacao` | `SERIAL` | `PRIMARY KEY` | Identificador único da resposta enviada. |
+| `id_curso` | `INTEGER` | `FK → curso(id_curso), NOT NULL` | Curso técnico ou categoria selecionada. |
+| `curso_digitado` | `VARCHAR(80)` | `NULL` | Nome digitado livremente quando `id_curso` corresponder a "Outro". |
+| `serie_turma` | `VARCHAR(10)` | `NOT NULL, CHECK` | Restrita exclusivamente a: `'1º Ano'`, `'2º Ano'`, `'3º Ano'`. |
+| `faixa_etaria` | `VARCHAR(20)` | `NOT NULL, CHECK` | Restrita a: `'14 a 15 anos'`, `'16 a 17 anos'`, `'18 anos ou mais'`. |
+| `genero` | `VARCHAR(30)` | `NOT NULL, CHECK` | `'Feminino'`, `'Masculino'`, `'Outro'`, `'Prefiro não informar'`. |
+| `pratica_esporte` | `BOOLEAN` | `NOT NULL` | Declaração binária de prática regular (`TRUE` ou `FALSE`). |
+| `frequencia` | `VARCHAR(35)` | `NOT NULL, CHECK` | Regularidade semanal declarada. |
+| `esporte_desejado` | `VARCHAR(50)` | `NOT NULL` | Modalidade que o discente tem maior interesse em praticar. |
+| `esporte_escola` | `VARCHAR(50)` | `NOT NULL` | Modalidade desejada nas dependências do colégio. |
+| `data_submissao` | `TIMESTAMPTZ` | `NOT NULL, DEFAULT CURRENT_TIMESTAMP` | Carimbo de data e hora do registro. |
+
+#### Tabela 3: `resposta_modalidade`
+Decomposição relacional em 3FN para registrar as modalidades assinaladas na questão de múltipla escolha.
+
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_resposta_mod` | `SERIAL` | `PRIMARY KEY` | Identificador da linha da modalidade praticada. |
+| `id_participacao` | `INTEGER` | `FK → participacao(id_participacao) ON DELETE CASCADE` | Vínculo com a participação do aluno. |
+| `modalidade` | `VARCHAR(50)` | `NOT NULL, CHECK` | Modalidade assinalada (ex.: *Futebol*, *Vôlei*, *Dança*). |
+
+#### Tabela 4: `resposta_barreira`
+Decomposição relacional em 3FN para registrar os fatores limitantes assinalados na questão de múltipla escolha.
+
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_resposta_bar` | `SERIAL` | `PRIMARY KEY` | Identificador da linha da barreira assinalada. |
+| `id_participacao` | `INTEGER` | `FK → participacao(id_participacao) ON DELETE CASCADE` | Vínculo com a participação do aluno. |
+| `barreira` | `VARCHAR(60)` | `NOT NULL, CHECK` | Fator limitante (ex.: *Falta de tempo*, *Nada dificulta*). |
+
+---
+
+### 5.3. Script SQL DDL Completo e Executável (PostgreSQL 16+)
+
 ```sql
 -- ============================================================
 -- Mapa Esportivo — Sistema de Levantamento de Perfil Esportivo
--- Instituição: Escola Técnica Estadual Chico Science (Olinda/PE)
+-- Instituição: Colégio EREM Santa Ana (Olinda/PE)
 -- SGBD: PostgreSQL 16+
 -- Script DDL Normalizado em 3FN
 -- ============================================================
@@ -287,7 +200,7 @@ CREATE TABLE curso (
     ativo          BOOLEAN      NOT NULL DEFAULT TRUE
 );
 
--- Inserção dos cursos oficiais da ETE Chico Science
+-- Cursos de referência da rede estadual e opção personalizada
 INSERT INTO curso (nome, sigla) VALUES 
 ('Nutrição e Dietética', 'NUTRI'),
 ('Farmácia', 'FARM'),
@@ -322,7 +235,7 @@ CREATE INDEX idx_participacao_curso   ON participacao (id_curso);
 CREATE INDEX idx_participacao_serie   ON participacao (serie_turma);
 CREATE INDEX idx_participacao_pratica ON participacao (pratica_esporte);
 
--- 3. TABELA: resposta_modalidade (N:N desnormalizado para 3FN)
+-- 3. TABELA: resposta_modalidade (N:N em 3FN)
 CREATE TABLE resposta_modalidade (
     id_resposta_mod   SERIAL      PRIMARY KEY,
     id_participacao   INTEGER     NOT NULL REFERENCES participacao(id_participacao) ON DELETE CASCADE,
@@ -336,7 +249,7 @@ CREATE TABLE resposta_modalidade (
 CREATE INDEX idx_resp_mod_part ON resposta_modalidade (id_participacao);
 CREATE INDEX idx_resp_mod_nome ON resposta_modalidade (modalidade);
 
--- 4. TABELA: resposta_barreira (N:N desnormalizado para 3FN)
+-- 4. TABELA: resposta_barreira (N:N em 3FN)
 CREATE TABLE resposta_barreira (
     id_resposta_bar   SERIAL      PRIMARY KEY,
     id_participacao   INTEGER     NOT NULL REFERENCES participacao(id_participacao) ON DELETE CASCADE,
@@ -351,7 +264,7 @@ CREATE TABLE resposta_barreira (
 CREATE INDEX idx_resp_bar_part ON resposta_barreira (id_participacao);
 CREATE INDEX idx_resp_bar_nome ON resposta_barreira (barreira);
 
--- 5. VIEW ANALÍTICA: Indicadores Gerais Consolidados
+-- 5. VIEW ANALÍTICA: Consolidação de Indicadores do Dashboard
 CREATE OR REPLACE VIEW vw_indicadores_gerais AS
 SELECT
     COUNT(*) AS total_participantes,
@@ -364,11 +277,54 @@ FROM participacao;
 
 ---
 
-## 6. Conclusão
+## 6. Justificativa Arquitetural: Modelo Relacional (Documentação) vs. NoSQL em Produção
 
-A presente documentação especifica de maneira clara, objetiva e completa:
-1. **O que é o projeto**: Diagnóstico censitário e esportivo discente da ETE Chico Science;
-2. **Requisitos Funcionais**: 16 requisitos que englobam a coleta com cursos de saúde, opção de digitação livre, 3 anos letivos, desativação condicional e painel de indicadores;
-3. **Requisitos Não Funcionais**: 8 requisitos técnicos estritos assegurando responsividade mobile, proteção de anonimato pela LGPD, atomicidade transacional e alta performance;
-4. **Regras de Negócio**: 8 regras que garantem integridade dos dados e fidelidade à realidade escolar;
-5. **Detalhamento do Banco de Dados**: Especificação do modelo **NoSQL em Produção no Cloud Firestore** e do modelo **Relacional em PostgreSQL 16+ normalizado em 3FN** com script SQL DDL executável.
+Uma decisão de engenharia deliberada foi tomada no desenvolvimento do projeto **Mapa Esportivo**:
+- **Neste documento técnico (.md)**, detalha-se **exclusivamente o Modelo Relacional (PostgreSQL 16+)** normalizado em 3FN;
+- **Na aplicação em produção no ar ([mapeamento-esportivo.web.app](https://mapeamento-esportivo.web.app))**, utiliza-se um **Banco de Dados Não-Relacional (Firebase Cloud Firestore — NoSQL Document Store)**.
+
+As razões técnicas e pedagógicas que fundamentam essa estratégia são as seguintes:
+
+### 6.1. Por que o documento técnico adota exclusivamente o Modelo Relacional?
+1. **Rigor Teórico e Metodologia Acadêmica**: A disciplina de Análise de Sistemas e Banco de Dados exige o domínio comprovado de conceitos fundamentais da álgebra relacional, cardinalidade (1:N, N:N), normalização (1FN, 2FN e 3FN), integridade referencial com chaves primárias e estrangeiras (`FOREIGN KEY`), índices btree e constraints declarativas (`CHECK`, `UNIQUE`, `NOT NULL`).
+2. **Padrão Corporativo de Auditoria e Modelagem**: Em ambientes corporativos e governamentais de grande porte, sistemas censitários e institucionais exigem esquemas relacionais formais pré-definidos para garantir a consistência das entidades e viabilizar consultas analíticas complexas via SQL padrão (ANSI SQL).
+
+### 6.2. Por que a aplicação "no ar" (produção) utiliza o Banco Não-Relacional (Firestore)?
+1. **Viabilidade Econômica e Custo Zero (Projetos de Extensão Escolar)**:
+   - Manter um banco de dados relacional (como PostgreSQL ou MySQL) em nuvem requer servidores virtuais dedicados (ex.: AWS RDS, GCP Cloud SQL ou Heroku Postgres), os quais possuem custos mensais em dólares inviáveis para um projeto de extensão universitária sem fins lucrativos voltado a uma escola pública.
+   - O Firebase Cloud Firestore opera no modelo *Serverless* (plano gratuito Spark), provendo armazenamento em nuvem de alta disponibilidade sem custo algum para a instituição.
+2. **Picos de Concorrência Massiva em Salas de Aula**:
+   - Durante a aplicação do questionário pelos professores, dezenas ou centenas de alunos acessam simultaneamente pelos seus smartphones em curtos intervalos de 5 a 10 minutos.
+   - Instâncias básicas de bancos SQL sofrem com o esgotamento de *pool* de conexões simultâneas (*connection exhaustion*). O Firestore escala elasticamente na infraestrutura global do Google Cloud, processando requisições paralelas ilimitadas sem lentidão ou recusa de conexões.
+3. **Sincronização em Tempo Real (Realtime Snapshots)**:
+   - O painel analítico (Dashboard) foi concebido para que os professores e alunos vejam os gráficos mudando ao vivo enquanto as respostas chegam. O Firestore possui suporte nativo a WebSockets via *listeners* reativos, dispensando a programação e manutenção de uma infraestrutura complexa de mensageria ou Socket.io.
+4. **Arquitetura Direta sem Backend Intermediário (BaaS)**:
+   - A combinação de Firestore com regras de segurança no servidor (`firestore.rules`) permitiu validar os dados com rigor diretamente na borda (*edge*), dispensando uma camada intermediária de API REST em Node/Python e reduzindo a superfície de falhas e manutenção.
+
+---
+
+## 7. Links e QR Codes da Aplicação
+
+Para facilitar o acesso da comunidade escolar do **Colégio EREM Santa Ana**, foram gerados QR Codes em alta resolução (vetor SVG e PNG para impressão) integrados ao sistema:
+
+1. **Questionário Discente (Pesquisa)**:  
+   `https://mapeamento-esportivo.web.app/#survey`  
+   *Finalidade:* Distribuição direta para os estudantes responderem pelo celular em sala de aula ou nos murais da escola.
+2. **Painel de Indicadores (Dashboard)**:  
+   `https://mapeamento-esportivo.web.app/#dashboard`  
+   *Finalidade:* Apresentação analítica dos gráficos e estatísticas para os professores de Educação Física e coordenação.
+3. **Sobre o Projeto**:  
+   `https://mapeamento-esportivo.web.app/#about`  
+   *Finalidade:* Informações sobre os objetivos pedagógicos, anonimato e metodologia.
+
+Os arquivos de imagem dos QR Codes encontram-se disponíveis no repositório em `public/qrcodes/` e podem ser visualizados ou baixados diretamente através do botão **"QR Codes"** no menu do site.
+
+---
+
+## 8. Conclusão
+
+A especificação do **Mapa Esportivo** consolida com fidelidade a realidade do **Colégio EREM Santa Ana (Olinda/PE)**:
+- **Escopo Claro:** Censo esportivo 100% anônimo no Ensino Médio;
+- **Requisitos e Regras:** 16 requisitos funcionais objetivos, 7 não funcionais e 8 regras de negócio de alta integridade;
+- **Modelo Relacional Rigoroso:** 4 tabelas normalizadas em 3FN com DDL executável em PostgreSQL 16+;
+- **Justificativa Transparente:** Exposição clara do porquê o modelo teórico é estritamente relacional (atendendo às exigências acadêmicas) e a execução em produção é NoSQL (garantindo gratuidade, escala concorrente e reatividade em tempo real).

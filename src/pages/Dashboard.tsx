@@ -49,7 +49,7 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <h1>Qual é o perfil esportivo da nossa escola?</h1>
           <p className="lead">
             Uma pesquisa simples para entender interesses, hábitos e oportunidades de atividade física
-            na ETE Chico Science.
+            no Colégio EREM Santa Ana.
           </p>
           <button className="primary-button" onClick={onSurvey}>
             Participar da pesquisa <ArrowRight size={18} />
@@ -192,7 +192,7 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
             <ChartCard
               categoryBadge="Curso Técnico"
               title="Distribuição por curso"
-              description="Distribuição dos participantes por curso na ETE"
+              description="Distribuição dos participantes por curso na EREM Santa Ana"
               data={stats.courses?.length ? stats.courses : (demoStats.courses ?? [])}
             />
             <ChartCard
@@ -244,7 +244,7 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
             <ChartCard
               categoryBadge="Demanda Escolar"
               title="Modalidades desejadas na escola"
-              description="Projetos e esportes para incentivo na ETE"
+              description="Projetos e esportes para incentivo na EREM Santa Ana"
               data={stats.desiredAtSchool?.length ? stats.desiredAtSchool : (demoStats.desiredAtSchool ?? [])}
             />
             <ChartCard

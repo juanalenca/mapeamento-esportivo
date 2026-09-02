@@ -1,5 +1,6 @@
-import { Activity, Menu, X } from 'lucide-react'
+import { Activity, Menu, X, QrCode } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { QrCodeModal } from './QrCodeModal'
 
 interface HeaderProps {
   page: string
@@ -8,6 +9,8 @@ interface HeaderProps {
 
 export function Header({ page, onNavigate }: HeaderProps) {
   const [open, setOpen] = useState(false)
+  const [showQrModal, setShowQrModal] = useState(false)
+
   const navigate = (target: 'dashboard' | 'survey' | 'about') => {
     onNavigate(target)
     setOpen(false)
@@ -15,7 +18,10 @@ export function Header({ page, onNavigate }: HeaderProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') {
+        setOpen(false)
+        setShowQrModal(false)
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
@@ -32,6 +38,7 @@ export function Header({ page, onNavigate }: HeaderProps) {
             Mapa <strong>Esportivo</strong>
           </span>
         </button>
+
         <button
           className="menu-button"
           aria-label={open ? 'Fechar menu' : 'Abrir menu'}
@@ -40,6 +47,7 @@ export function Header({ page, onNavigate }: HeaderProps) {
         >
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
+
         <nav className={open ? 'navigation open' : 'navigation'} aria-label="Navegação principal">
           <button className={page === 'dashboard' ? 'active' : ''} onClick={() => navigate('dashboard')}>
             Painel
@@ -50,9 +58,21 @@ export function Header({ page, onNavigate }: HeaderProps) {
           <button className={page === 'about' ? 'active' : ''} onClick={() => navigate('about')}>
             Sobre
           </button>
+          <button
+            className="nav-qr-btn"
+            onClick={() => {
+              setShowQrModal(true)
+              setOpen(false)
+            }}
+            title="Gerar e baixar QR Codes dos links"
+          >
+            <QrCode size={16} /> QR Codes
+          </button>
         </nav>
       </header>
+
       {open && <div className="nav-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />}
+      {showQrModal && <QrCodeModal onClose={() => setShowQrModal(false)} />}
     </>
   )
 }

@@ -1,6 +1,6 @@
 # Mapa Esportivo
 
-Plataforma de extensão curricularizada para mapear, de forma anônima, hábitos, interesses e dificuldades relacionadas a esportes entre alunos da ETE Chico Science, Olinda/PE.
+Plataforma de extensão curricularizada para mapear, de forma anônima, hábitos, interesses e dificuldades relacionadas a esportes entre alunos do Colégio EREM Santa Ana, Olinda/PE.
 
 ## Tecnologias
 

@@ -129,7 +129,7 @@ export function Survey({ onBack }: { onBack: () => void }) {
           <h1>Obrigado por participar!</h1>
           <p>
             Sua contribuição anônima foi salva com sucesso e já está integrada aos gráficos e estatísticas
-            do painel da ETE Chico Science.
+            do painel do Colégio EREM Santa Ana.
           </p>
           <div className="success-actions">
             <button className="primary-button" onClick={onBack}>
@@ -461,7 +461,7 @@ export function Survey({ onBack }: { onBack: () => void }) {
             <div>
               <h2>Qual atividade esportiva você mais gostaria de ver na escola?</h2>
               <p className="field-help">
-                Modalidade que a ETE Chico Science poderia incentivar em oficinas, torneios ou projetos.
+                Modalidade que o Colégio EREM Santa Ana poderia incentivar em oficinas, torneios ou projetos.
               </p>
             </div>
           </div>
