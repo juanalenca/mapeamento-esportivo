@@ -98,11 +98,12 @@ Para demonstrar clareza arquitetural, as regras do sistema foram separadas entre
 
 ---
 
-## 6. Detalhamento do Banco de Dados Relacional (PostgreSQL 16+)
+## 6. Modelagem de Dados
 
-O modelo foi estruturado segundo os princípios do modelo relacional e organizado para atender à **Terceira Forma Normal (3FN)**, reduzindo redundâncias e mantendo a integridade dos dados.
+O banco de dados do Mapa Esportivo foi projetado seguindo a metodologia de modelagem em três níveis — **Conceitual**, **Lógico** e **Físico** — e organizado para atender à **Terceira Forma Normal (3FN)**, reduzindo redundâncias e mantendo a integridade dos dados.
 
 ### 6.1. Justificativa da Estrutura e Normalização (3FN)
+
 O esquema relacional é composto por **4 tabelas**:
 1. **`curso`** (Entidade Forte de Catálogo): Armazena as opções de cursos/itinerários institucionais padronizados, evitando redundância de strings e assegurando integridade referencial.
 2. **`participacao`** (Entidade Central de Sessão): Registra a participação do estudante e armazena todos os atributos atômicos e monovalorados da resposta (relação 1:1 com a participação: curso selecionado, curso digitado em caso de `Outro`, série, faixa etária, gênero, prática binária, frequência, esportes desejados e carimbo de envio).
@@ -115,7 +116,9 @@ O esquema relacional é composto por **4 tabelas**:
 
 ---
 
-### 6.2. Diagrama Entidade-Relacionamento (DER / Mermaid)
+### 6.2. Modelo Conceitual (MER — Modelo Entidade-Relacionamento)
+
+O Modelo Conceitual representa a visão de alto nível do domínio do problema, focando nas **entidades** do sistema, seus **atributos essenciais** e os **relacionamentos** entre elas, sem qualquer compromisso com tecnologias ou tipos de dados específicos de um SGBD.
 
 ```mermaid
 erDiagram
@@ -124,95 +127,173 @@ erDiagram
     PARTICIPACAO ||--o{ RESPOSTA_BARREIRA : "enfrenta"
 
     CURSO {
-        int id_curso PK
-        varchar nome UK
-        varchar sigla UK
-        boolean ativo
+        id_curso PK "Identificador do curso"
+        nome "Nome do curso ou itinerário"
+        sigla "Sigla de referência"
+        ativo "Indicador de disponibilidade"
     }
 
     PARTICIPACAO {
-        int id_participacao PK
-        int id_curso FK
-        varchar curso_digitado
-        varchar serie
-        varchar faixa_etaria
-        varchar genero
-        boolean pratica_esporte
-        varchar frequencia
-        varchar esporte_desejado
-        varchar esporte_escola
-        timestamptz data_submissao
+        id_participacao PK "Identificador da participação"
+        id_curso FK "Curso ou itinerário do estudante"
+        curso_digitado "Texto livre quando curso é Outro"
+        serie "Ano do Ensino Médio"
+        faixa_etaria "Faixa de idade do estudante"
+        genero "Gênero declarado"
+        pratica_esporte "Indicador de prática esportiva"
+        frequencia "Regularidade semanal de prática"
+        esporte_desejado "Modalidade de maior interesse"
+        esporte_escola "Modalidade desejada na escola"
+        data_submissao "Momento do envio"
     }
 
     RESPOSTA_MODALIDADE {
-        int id_resposta_mod PK
-        int id_participacao FK
-        varchar modalidade
+        id_resposta_mod PK "Identificador da resposta"
+        id_participacao FK "Vínculo com a participação"
+        modalidade "Esporte praticado atualmente"
     }
 
     RESPOSTA_BARREIRA {
-        int id_resposta_bar PK
-        int id_participacao FK
-        varchar barreira
+        id_resposta_bar PK "Identificador da resposta"
+        id_participacao FK "Vínculo com a participação"
+        barreira "Fator de dificuldade declarado"
     }
 ```
 
----
+**Cardinalidades identificadas:**
 
-### 6.3. Dicionário de Dados das Tabelas Relacionais
-
-#### Tabela 1: `curso`
-| Atributo | Tipo de Dado | Restrições | Descrição |
-|---|---|---|---|
-| `id_curso` | `SERIAL` | `PRIMARY KEY` | Identificador autoincrementado do curso/itinerário. |
-| `nome` | `VARCHAR(120)` | `NOT NULL, UNIQUE` | Nome oficial do curso/itinerário. |
-| `sigla` | `VARCHAR(15)` | `NOT NULL, UNIQUE` | Sigla curta de identificação. |
-| `ativo` | `BOOLEAN` | `NOT NULL, DEFAULT TRUE` | Status para listagem no sistema. |
-
-#### Tabela 2: `participacao`
-| Atributo | Tipo de Dado | Restrições | Descrição |
-|---|---|---|---|
-| `id_participacao` | `SERIAL` | `PRIMARY KEY` | Identificador único da resposta enviada. |
-| `id_curso` | `INTEGER` | `FK → curso(id_curso), NOT NULL` | Vínculo com a tabela de cursos. |
-| `curso_digitado` | `VARCHAR(80)` | `NULL` | Texto preenchido caso o curso seja "Outro". |
-| `serie` | `VARCHAR(10)` | `NOT NULL, CHECK` | Restrita a: `'1º Ano'`, `'2º Ano'`, `'3º Ano'`. |
-| `faixa_etaria` | `VARCHAR(20)` | `NOT NULL, CHECK` | Restrita a: `'14 a 15 anos'`, `'16 a 17 anos'`, `'18 anos ou mais'`. |
-| `genero` | `VARCHAR(30)` | `NOT NULL, CHECK` | `'Feminino'`, `'Masculino'`, `'Outro'`, `'Prefiro não informar'`. |
-| `pratica_esporte` | `BOOLEAN` | `NOT NULL` | Indicador binário de prática regular de atividades físicas. |
-| `frequencia` | `VARCHAR(35)` | `NOT NULL, CHECK` | Frequência declarada de exercícios por semana. |
-| `esporte_desejado` | `VARCHAR(50)` | `NOT NULL` | Modalidade de maior interesse pessoal. |
-| `esporte_escola` | `VARCHAR(50)` | `NOT NULL` | Modalidade demandada para as dependências da escola. |
-| `data_submissao` | `TIMESTAMPTZ` | `NOT NULL, DEFAULT CURRENT_TIMESTAMP` | Data e hora de envio da participação. |
-
-#### Tabela 3: `resposta_modalidade`
-| Atributo | Tipo de Dado | Restrições | Descrição |
-|---|---|---|---|
-| `id_resposta_mod` | `SERIAL` | `PRIMARY KEY` | Identificador único do registro da modalidade. |
-| `id_participacao` | `INTEGER` | `FK → participacao(id_participacao) ON DELETE CASCADE` | Vínculo com a participação correspondente. |
-| `modalidade` | `VARCHAR(50)` | `NOT NULL, CHECK` | Modalidade assinalada na questão de múltipla escolha. |
-
-#### Tabela 4: `resposta_barreira`
-| Atributo | Tipo de Dado | Restrições | Descrição |
-|---|---|---|---|
-| `id_resposta_bar` | `SERIAL` | `PRIMARY KEY` | Identificador único do registro da barreira. |
-| `id_participacao` | `INTEGER` | `FK → participacao(id_participacao) ON DELETE CASCADE` | Vínculo com a participação correspondente. |
-| `barreira` | `VARCHAR(60)` | `NOT NULL, CHECK` | Fator de dificuldade assinalado pelo discente. |
+| Relacionamento | Cardinalidade | Descrição |
+|---|---|---|
+| CURSO → PARTICIPAÇÃO | 1 : N | Um curso/itinerário pode ser informado em muitas participações; cada participação informa exatamente um curso. |
+| PARTICIPAÇÃO → RESPOSTA_MODALIDADE | 1 : N | Uma participação pode registrar zero ou mais modalidades praticadas (questão de múltipla escolha). |
+| PARTICIPAÇÃO → RESPOSTA_BARREIRA | 1 : N | Uma participação pode registrar uma ou mais barreiras enfrentadas (questão de múltipla escolha). |
 
 ---
 
-### 6.4. Script SQL DDL Completo (PostgreSQL 16+)
+### 6.3. Modelo Lógico (Esquema Relacional)
+
+O Modelo Lógico traduz o modelo conceitual em um **esquema relacional normalizado**, definindo tabelas, colunas, tipos de dados abstratos, chaves primárias (PK), chaves estrangeiras (FK) e restrições de integridade — ainda independente de um SGBD específico.
+
+#### Representação Textual do Esquema Relacional
+
+```
+curso (id_curso PK, nome UNIQUE NOT NULL, sigla UNIQUE NOT NULL, ativo NOT NULL)
+
+participacao (id_participacao PK, id_curso FK→curso NOT NULL, curso_digitado NULL,
+              serie NOT NULL, faixa_etaria NOT NULL, genero NOT NULL,
+              pratica_esporte NOT NULL, frequencia NOT NULL,
+              esporte_desejado NOT NULL, esporte_escola NOT NULL,
+              data_submissao NOT NULL)
+
+resposta_modalidade (id_resposta_mod PK, id_participacao FK→participacao NOT NULL,
+                     modalidade NOT NULL,
+                     UNIQUE(id_participacao, modalidade))
+
+resposta_barreira (id_resposta_bar PK, id_participacao FK→participacao NOT NULL,
+                   barreira NOT NULL,
+                   UNIQUE(id_participacao, barreira))
+```
+
+#### Diagrama do Modelo Lógico (Tabelas Relacionais)
+
+```mermaid
+erDiagram
+    curso ||--o{ participacao : "FK id_curso"
+    participacao ||--o{ resposta_modalidade : "FK id_participacao"
+    participacao ||--o{ resposta_barreira : "FK id_participacao"
+
+    curso {
+        SERIAL id_curso PK
+        VARCHAR_120 nome "UNIQUE, NOT NULL"
+        VARCHAR_15 sigla "UNIQUE, NOT NULL"
+        BOOLEAN ativo "NOT NULL, DEFAULT TRUE"
+    }
+
+    participacao {
+        SERIAL id_participacao PK
+        INTEGER id_curso FK "NOT NULL"
+        VARCHAR_80 curso_digitado "NULL"
+        VARCHAR_10 serie "NOT NULL, CHECK"
+        VARCHAR_20 faixa_etaria "NOT NULL, CHECK"
+        VARCHAR_30 genero "NOT NULL, CHECK"
+        BOOLEAN pratica_esporte "NOT NULL"
+        VARCHAR_35 frequencia "NOT NULL, CHECK"
+        VARCHAR_50 esporte_desejado "NOT NULL"
+        VARCHAR_50 esporte_escola "NOT NULL"
+        TIMESTAMPTZ data_submissao "NOT NULL, DEFAULT NOW"
+    }
+
+    resposta_modalidade {
+        SERIAL id_resposta_mod PK
+        INTEGER id_participacao FK "NOT NULL, ON DELETE CASCADE"
+        VARCHAR_50 modalidade "NOT NULL, CHECK"
+    }
+
+    resposta_barreira {
+        SERIAL id_resposta_bar PK
+        INTEGER id_participacao FK "NOT NULL, ON DELETE CASCADE"
+        VARCHAR_60 barreira "NOT NULL, CHECK"
+    }
+```
+
+#### Dicionário de Dados
+
+##### Tabela 1: `curso`
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_curso` | Inteiro autoincremental | Chave Primária | Identificador único do curso/itinerário. |
+| `nome` | Cadeia de caracteres (até 120) | Não nulo, Único | Nome oficial do curso/itinerário. |
+| `sigla` | Cadeia de caracteres (até 15) | Não nulo, Único | Sigla curta de identificação. |
+| `ativo` | Booleano | Não nulo, Padrão: verdadeiro | Status para listagem no sistema. |
+
+##### Tabela 2: `participacao`
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_participacao` | Inteiro autoincremental | Chave Primária | Identificador único da resposta enviada. |
+| `id_curso` | Inteiro | Chave Estrangeira → `curso(id_curso)`, Não nulo | Vínculo com a tabela de cursos. |
+| `curso_digitado` | Cadeia de caracteres (até 80) | Nulável | Texto preenchido caso o curso seja "Outro". |
+| `serie` | Cadeia de caracteres (até 10) | Não nulo, Domínio restrito | Restrita a: `'1º Ano'`, `'2º Ano'`, `'3º Ano'`. |
+| `faixa_etaria` | Cadeia de caracteres (até 20) | Não nulo, Domínio restrito | Restrita a: `'14 a 15 anos'`, `'16 a 17 anos'`, `'18 anos ou mais'`. |
+| `genero` | Cadeia de caracteres (até 30) | Não nulo, Domínio restrito | `'Feminino'`, `'Masculino'`, `'Outro'`, `'Prefiro não informar'`. |
+| `pratica_esporte` | Booleano | Não nulo | Indicador binário de prática regular. |
+| `frequencia` | Cadeia de caracteres (até 35) | Não nulo, Domínio restrito | Frequência declarada de exercícios por semana. |
+| `esporte_desejado` | Cadeia de caracteres (até 50) | Não nulo | Modalidade de maior interesse pessoal. |
+| `esporte_escola` | Cadeia de caracteres (até 50) | Não nulo | Modalidade demandada para as dependências da escola. |
+| `data_submissao` | Data e hora com fuso | Não nulo, Padrão: momento atual | Data e hora de envio da participação. |
+
+##### Tabela 3: `resposta_modalidade`
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_resposta_mod` | Inteiro autoincremental | Chave Primária | Identificador único do registro da modalidade. |
+| `id_participacao` | Inteiro | Chave Estrangeira → `participacao(id_participacao)`, Exclusão em cascata, Não nulo | Vínculo com a participação correspondente. |
+| `modalidade` | Cadeia de caracteres (até 50) | Não nulo, Domínio restrito, Par único com `id_participacao` | Modalidade assinalada na questão de múltipla escolha. |
+
+##### Tabela 4: `resposta_barreira`
+| Atributo | Tipo de Dado | Restrições | Descrição |
+|---|---|---|---|
+| `id_resposta_bar` | Inteiro autoincremental | Chave Primária | Identificador único do registro da barreira. |
+| `id_participacao` | Inteiro | Chave Estrangeira → `participacao(id_participacao)`, Exclusão em cascata, Não nulo | Vínculo com a participação correspondente. |
+| `barreira` | Cadeia de caracteres (até 60) | Não nulo, Domínio restrito, Par único com `id_participacao` | Fator de dificuldade assinalado pelo discente. |
+
+---
+
+### 6.4. Modelo Físico (DDL — PostgreSQL 16+)
+
+O Modelo Físico materializa o modelo lógico em um **script DDL executável** para o SGBD PostgreSQL 16+, incluindo tipos de dados nativos (`SERIAL`, `VARCHAR`, `TIMESTAMPTZ`), constraints de domínio (`CHECK IN`), constraints compostas, estratégias de exclusão referencial (`ON DELETE RESTRICT/CASCADE`), índices B-tree para otimização de consultas e uma view analítica para consolidação de indicadores.
 
 ```sql
 -- ============================================================
 -- Mapa Esportivo — Sistema de Levantamento de Perfil Esportivo
 -- Instituição: Colégio EREM Santa Ana (Olinda/PE)
 -- SGBD: PostgreSQL 16+
--- Script DDL Normalizado em 3FN
+-- Modelo Físico — DDL Normalizado em 3FN
 -- ============================================================
 
 SET client_encoding = 'UTF8';
 
+-- ─────────────────────────────────────────────
 -- 1. TABELA: curso
+-- ─────────────────────────────────────────────
 CREATE TABLE curso (
     id_curso       SERIAL       PRIMARY KEY,
     nome           VARCHAR(120) NOT NULL UNIQUE,
@@ -220,14 +301,16 @@ CREATE TABLE curso (
     ativo          BOOLEAN      NOT NULL DEFAULT TRUE
 );
 
--- Cursos de referência da rede estadual e opção personalizada
+-- Carga inicial: cursos de referência e opção personalizada
 INSERT INTO curso (nome, sigla) VALUES 
 ('Nutrição e Dietética', 'NUTRI'),
 ('Farmácia', 'FARM'),
 ('Enfermagem', 'ENF'),
 ('Outro', 'OUTRO');
 
+-- ─────────────────────────────────────────────
 -- 2. TABELA: participacao
+-- ─────────────────────────────────────────────
 CREATE TABLE participacao (
     id_participacao   SERIAL       PRIMARY KEY,
     id_curso          INTEGER      NOT NULL REFERENCES curso(id_curso) ON DELETE RESTRICT,
@@ -243,19 +326,25 @@ CREATE TABLE participacao (
     esporte_desejado  VARCHAR(50)  NOT NULL,
     esporte_escola    VARCHAR(50)  NOT NULL,
     data_submissao    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- Constraint composta: se o curso for "Outro" (id=4), o campo digitado deve estar preenchido
     CONSTRAINT chk_curso_outro_preenchido CHECK (
         (id_curso <> 4) OR (curso_digitado IS NOT NULL AND length(trim(curso_digitado)) >= 2)
     ),
+    -- Constraint composta: se não pratica esporte, a frequência deve ser "Não pratico"
     CONSTRAINT chk_nao_pratica_frequencia CHECK (
         pratica_esporte = TRUE OR frequencia = 'Não pratico'
     )
 );
 
+-- Índices B-tree para otimização de consultas analíticas do Dashboard
 CREATE INDEX idx_participacao_curso   ON participacao (id_curso);
 CREATE INDEX idx_participacao_serie   ON participacao (serie);
 CREATE INDEX idx_participacao_pratica ON participacao (pratica_esporte);
 
--- 3. TABELA: resposta_modalidade (Decomposição N:N em 3FN)
+-- ─────────────────────────────────────────────
+-- 3. TABELA: resposta_modalidade
+--    (Decomposição de atributo multivalorado)
+-- ─────────────────────────────────────────────
 CREATE TABLE resposta_modalidade (
     id_resposta_mod   SERIAL      PRIMARY KEY,
     id_participacao   INTEGER     NOT NULL REFERENCES participacao(id_participacao) ON DELETE CASCADE,
@@ -269,7 +358,10 @@ CREATE TABLE resposta_modalidade (
 CREATE INDEX idx_resp_mod_part ON resposta_modalidade (id_participacao);
 CREATE INDEX idx_resp_mod_nome ON resposta_modalidade (modalidade);
 
--- 4. TABELA: resposta_barreira (Decomposição N:N em 3FN)
+-- ─────────────────────────────────────────────
+-- 4. TABELA: resposta_barreira
+--    (Decomposição de atributo multivalorado)
+-- ─────────────────────────────────────────────
 CREATE TABLE resposta_barreira (
     id_resposta_bar   SERIAL      PRIMARY KEY,
     id_participacao   INTEGER     NOT NULL REFERENCES participacao(id_participacao) ON DELETE CASCADE,
@@ -284,8 +376,11 @@ CREATE TABLE resposta_barreira (
 CREATE INDEX idx_resp_bar_part ON resposta_barreira (id_participacao);
 CREATE INDEX idx_resp_bar_nome ON resposta_barreira (barreira);
 
--- 5. VIEW ANALÍTICA: Consolidação Dinâmica de Indicadores
--- Nota: Trata-se de uma consulta analítica dinâmica para extração de métricas consolidadas via SQL.
+-- ─────────────────────────────────────────────
+-- 5. VIEW ANALÍTICA
+--    Consulta dinâmica para extração de métricas
+--    consolidadas (executada sob demanda via SQL)
+-- ─────────────────────────────────────────────
 CREATE OR REPLACE VIEW vw_indicadores_gerais AS
 SELECT
     COUNT(*) AS total_participantes,
@@ -295,6 +390,19 @@ SELECT
     ROUND(COUNT(*) FILTER (WHERE pratica_esporte = FALSE)::NUMERIC / NULLIF(COUNT(*), 0) * 100, 1) AS perc_nao_praticantes
 FROM participacao;
 ```
+
+#### Resumo dos Elementos Físicos Específicos do PostgreSQL
+
+| Elemento | Quantidade | Finalidade |
+|---|---|---|
+| Tabelas (`CREATE TABLE`) | 4 | Persistência estruturada dos dados censitários. |
+| Constraints `CHECK` de domínio | 7 | Restrição de valores válidos diretamente no SGBD. |
+| Constraints compostas | 2 | Validação cruzada entre colunas (`chk_curso_outro_preenchido`, `chk_nao_pratica_frequencia`). |
+| Constraints de unicidade composta | 2 | Impede duplicação de modalidade ou barreira na mesma participação. |
+| Chaves estrangeiras | 3 | Integridade referencial com `ON DELETE RESTRICT` e `ON DELETE CASCADE`. |
+| Índices B-tree | 6 | Otimização de consultas analíticas por curso, série, prática, modalidade e barreira. |
+| Views analíticas | 1 | Consolidação dinâmica de KPIs sob demanda via `SELECT`. |
+| Carga inicial (`INSERT`) | 4 registros | Catálogo de cursos/itinerários disponíveis na instituição. |
 
 ---
 
@@ -341,5 +449,5 @@ Na interface da aplicação web, o botão **"QR Codes"** no menu superior permit
 A especificação documental do **Mapa Esportivo** alinha-se às demandas do **Colégio EREM Santa Ana (Olinda/PE)**:
 - **Definição Objetiva:** Diagnóstico censitário desidentificado de hábitos esportivos discentes;
 - **Requisitos e Regras Estruturados:** 16 requisitos funcionais, 7 não funcionais e 8 regras de negócio com delimitação clara entre validação de aplicação e integridade de banco;
-- **Modelo Relacional Consistente:** 4 tabelas organizadas segundo a 3FN, com DDL completo em PostgreSQL 16+;
+- **Modelagem em Três Níveis:** Modelo Conceitual (MER com entidades, atributos e cardinalidades), Modelo Lógico (esquema relacional normalizado em 3FN com dicionário de dados) e Modelo Físico (DDL executável em PostgreSQL 16+ com índices B-tree, constraints compostas e view analítica);
 - **Justificativa Arquitetural Transparente:** Distinção explícita entre o modelo acadêmico relacional e a solução NoSQL serverless adotada em produção.
