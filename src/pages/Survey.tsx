@@ -89,12 +89,26 @@ export function Survey({ onBack }: { onBack: () => void }) {
     }))
   }
 
+function formatCourseName(input: string): string {
+  const trimmed = input.trim().replace(/\s+/g, ' ')
+  if (!trimmed) return 'Outro'
+  const lowerConnectives = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'em'])
+  return trimmed
+    .split(' ')
+    .map((word, index) => {
+      const lower = word.toLowerCase()
+      if (index > 0 && lowerConnectives.has(lower)) return lower
+      return lower.charAt(0).toUpperCase() + lower.slice(1)
+    })
+    .join(' ')
+}
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     setError('')
 
-    const finalCourse = courseChoice === 'Outro' ? customCourse.trim() : courseChoice
-    if (!finalCourse) {
+    const finalCourse = courseChoice === 'Outro' ? formatCourseName(customCourse) : courseChoice
+    if (!finalCourse || finalCourse === 'Outro' && !customCourse.trim()) {
       setError('Por favor, informe o nome do seu curso.')
       return
     }

@@ -42,6 +42,8 @@ export function ChartCard({
   const hasData = data && data.length > 0 && data.some((d) => d.value > 0)
   const totalVotes = data.reduce((acc, item) => acc + (item.value || 0), 0)
 
+  const chartHeight = Math.max(220, (data?.length || 0) * (isMobile ? 28 : 32) + 40)
+
   return (
     <section className="chart-card">
       <div className="chart-heading">
@@ -65,6 +67,7 @@ export function ChartCard({
       ) : (
         <div
           className="chart"
+          style={{ height: chartHeight, minHeight: chartHeight }}
           role="img"
           aria-label={`${title}: ${data.map((item) => `${item.name}, ${item.value}`).join('; ')}`}
         >
@@ -85,6 +88,7 @@ export function ChartCard({
               <YAxis
                 dataKey="name"
                 type="category"
+                interval={0}
                 width={yAxisWidth}
                 tickLine={false}
                 axisLine={false}

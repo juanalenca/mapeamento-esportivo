@@ -1,19 +1,9 @@
-import { createRequire } from 'module'
-import { readFileSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { backupFirestore } from './backup-firestore.js'
+import { db } from './firebase-admin.js'
 
-// Resolve firebase-admin from functions/ workspace
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const functionsDir = join(__dirname, '..', 'functions')
-const require = createRequire(join(functionsDir, 'node_modules', '_'))
-
-const { getApp } = require('firebase-admin/app')
-const { getFirestore } = require('firebase-admin/firestore')
-
-// App already initialized by backup-firestore.js import
-const db = getFirestore()
 
 async function deleteBatch(collectionRef, batchSize = 500) {
   let totalDeleted = 0
