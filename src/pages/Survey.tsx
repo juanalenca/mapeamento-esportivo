@@ -37,9 +37,9 @@ const initialResponse: SurveyResponse = {
   practicesSport: true,
   practicedSports: [],
   frequency: '2–3 vezes por semana',
-  desiredSport: 'Futebol',
+  desiredSport: '' as Sport,
   barriers: [],
-  desiredAtSchool: 'Futebol',
+  desiredAtSchool: '' as Sport,
 }
 
 export function Survey({ onBack }: { onBack: () => void }) {
@@ -48,8 +48,54 @@ export function Survey({ onBack }: { onBack: () => void }) {
   const [customCourse, setCustomCourse] = useState<string>('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [error, setError] = useState('')
+  const [errorCardId, setErrorCardId] = useState<string | null>(null)
+  const [isDirty, setIsDirty] = useState(false)
+
+  // Cálculo de progresso de preenchimento (0 a 100%)
+  const computeProgress = () => {
+    let completed = 0
+    const total = 6
+
+    // 1. Perfil demográfico
+    if (courseChoice !== 'Outro' || customCourse.trim()) completed++
+    // 2. Prática atual + modalidades se praticar
+    if (!form.practicesSport || form.practicedSports.length > 0) completed++
+    // 3. Frequência
+    if (form.frequency) completed++
+    // 4. Esporte desejado (sem valor vazio)
+    if (form.desiredSport) completed++
+    // 5. Barreiras
+    if (form.barriers.length > 0) completed++
+    // 6. Desejado na escola
+    if (form.desiredAtSchool) completed++
+
+    return Math.round((completed / total) * 100)
+  }
+
+  const progressPercent = computeProgress()
+
+  const handleBack = () => {
+    if (isDirty && status !== 'success') {
+      const confirmLeave = window.confirm(
+        'Você já preencheu dados no questionário. Deseja realmente voltar ao painel e descartar as respostas?'
+      )
+      if (!confirmLeave) return
+    }
+    onBack()
+  }
+
+  const scrollToCard = (id: string, errorMsg: string) => {
+    setError(errorMsg)
+    setErrorCardId(id)
+    const element = document.getElementById(id)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      setTimeout(() => setErrorCardId(null), 4000)
+    }
+  }
 
   const handleCourseChange = (selected: string) => {
+    setIsDirty(true)
     setCourseChoice(selected)
     if (selected === 'Outro') {
       setForm((cur) => ({ ...cur, course: customCourse.trim() || 'Outro' }))
@@ -59,22 +105,28 @@ export function Survey({ onBack }: { onBack: () => void }) {
   }
 
   const handleCustomCourseChange = (text: string) => {
+    setIsDirty(true)
     setCustomCourse(text)
     setForm((cur) => ({ ...cur, course: text.trim() || 'Outro' }))
   }
 
-  const toggle = <T extends string>(item: T, current: T[], update: (items: T[]) => void) =>
+  const toggle = <T extends string>(item: T, current: T[], update: (items: T[]) => void) => {
+    setIsDirty(true)
     update(current.includes(item) ? current.filter((entry) => entry !== item) : [...current, item])
+  }
 
-  const setPractice = (value: boolean) =>
+  const setPractice = (value: boolean) => {
+    setIsDirty(true)
     setForm((current) => ({
       ...current,
       practicesSport: value,
       practicedSports: value ? current.practicedSports.filter((sport) => sport !== 'Outro') : [],
-      frequency: value ? current.frequency : 'Não pratico',
+      frequency: value ? (current.frequency === 'Não pratico' ? '2–3 vezes por semana' : current.frequency) : 'Não pratico',
     }))
+  }
 
   const toggleBarrier = (barrier: Barrier) => {
+    setIsDirty(true)
     if (barrier === 'Nada dificulta') {
       return setForm((current) => ({
         ...current,
@@ -89,42 +141,54 @@ export function Survey({ onBack }: { onBack: () => void }) {
     }))
   }
 
-function formatCourseName(input: string): string {
-  const trimmed = input.trim().replace(/\s+/g, ' ')
-  if (!trimmed) return 'Outro'
-  const lowerConnectives = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'em'])
-  return trimmed
-    .split(' ')
-    .map((word, index) => {
-      const lower = word.toLowerCase()
-      if (index > 0 && lowerConnectives.has(lower)) return lower
-      return lower.charAt(0).toUpperCase() + lower.slice(1)
-    })
-    .join(' ')
-}
+  function formatCourseName(input: string): string {
+    const trimmed = input.trim().replace(/\s+/g, ' ')
+    if (!trimmed) return 'Outro'
+    const lowerConnectives = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'em'])
+    return trimmed
+      .split(' ')
+      .map((word, index) => {
+        const lower = word.toLowerCase()
+        if (index > 0 && lowerConnectives.has(lower)) return lower
+        return lower.charAt(0).toUpperCase() + lower.slice(1)
+      })
+      .join(' ')
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault()
     setError('')
 
     const finalCourse = courseChoice === 'Outro' ? formatCourseName(customCourse) : courseChoice
-    if (!finalCourse || finalCourse === 'Outro' && !customCourse.trim()) {
-      setError('Por favor, informe o nome do seu curso.')
+    if (!finalCourse || (finalCourse === 'Outro' && !customCourse.trim())) {
+      scrollToCard('step-demo', 'Perfil: Por favor, informe o nome do seu curso ou itinerário.')
       return
     }
 
     if (form.practicesSport && form.practicedSports.length === 0) {
-      setError('Selecione pelo menos uma atividade física que você pratica atualmente.')
+      scrollToCard('step-2', 'Pergunta 2: Selecione pelo menos uma atividade física que você pratica atualmente.')
       return
     }
+
+    if (!form.desiredSport) {
+      scrollToCard('step-4', 'Pergunta 4: Selecione qual esporte ou atividade você gostaria de praticar.')
+      return
+    }
+
     if (form.barriers.length === 0) {
-      setError('Selecione ao menos um fator que dificulta sua prática ou marque “Nada dificulta”.')
+      scrollToCard('step-5', 'Pergunta 5: Selecione ao menos um fator que dificulta sua prática ou marque “Nada dificulta”.')
+      return
+    }
+
+    if (!form.desiredAtSchool) {
+      scrollToCard('step-6', 'Pergunta 6: Selecione qual atividade esportiva você mais gostaria de ver na escola.')
       return
     }
 
     setStatus('sending')
     try {
       await sendSurveyResponse({ ...form, course: finalCourse })
+      setIsDirty(false)
       setStatus('success')
     } catch {
       setStatus('error')
@@ -169,7 +233,7 @@ function formatCourseName(input: string): string {
   return (
     <main className="survey-page">
       <div className="survey-header-nav">
-        <button className="back-button" onClick={onBack}>
+        <button className="back-button" onClick={handleBack} aria-label="Voltar ao painel de indicadores">
           <ArrowLeft size={18} /> Voltar ao painel
         </button>
         <span className="survey-security-badge">
@@ -187,11 +251,32 @@ function formatCourseName(input: string): string {
           Não coletamos nome, CPF ou matrícula. As informações de curso e turma servem exclusivamente 
           para análise estatística agregada por grupo.
         </p>
+
+        {/* Barra de Progresso Dinâmico */}
+        <div className="survey-progress-card" role="region" aria-label="Progresso da pesquisa">
+          <div className="survey-progress-meta">
+            <span className="survey-progress-label">Progresso da pesquisa</span>
+            <strong className="survey-progress-pct">{progressPercent}% concluído</strong>
+          </div>
+          <div className="survey-progress-track">
+            <div
+              className="survey-progress-bar"
+              style={{ width: `${progressPercent}%` }}
+              role="progressbar"
+              aria-valuenow={progressPercent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            />
+          </div>
+        </div>
       </section>
 
-      <form className="survey-form" onSubmit={submit}>
+      <form className="survey-form" onSubmit={submit} noValidate>
         {/* ── CARD 0: PERFIL DEMOGRÁFICO ── */}
-        <section className="survey-step-card demographic-card">
+        <section
+          id="step-demo"
+          className={`survey-step-card demographic-card ${errorCardId === 'step-demo' ? 'card-error' : ''}`}
+        >
           <div className="card-header">
             <span className="step-badge demo">
               <GraduationCap size={18} />
@@ -234,7 +319,7 @@ function formatCourseName(input: string): string {
                     autoFocus
                     maxLength={80}
                   />
-                  <small className="field-hint">Ex: Ciências Humanas, Linguagens, Técnico em Enfermagem, etc.</small>
+                  <small className="field-hint">Ex: Ciências Humanas, Linguagens, Técnico em Informática, etc.</small>
                 </div>
               )}
             </div>
@@ -242,13 +327,18 @@ function formatCourseName(input: string): string {
             {/* Série */}
             <div className="form-group">
               <label className="input-label">Série</label>
-              <div className="pill-group">
+              <div className="pill-group" role="radiogroup" aria-label="Série escolar">
                 {grades.map((grade) => (
                   <button
                     key={grade}
                     type="button"
+                    role="radio"
+                    aria-checked={form.grade === grade}
                     className={`pill-option ${form.grade === grade ? 'active' : ''}`}
-                    onClick={() => setForm({ ...form, grade: grade as Grade })}
+                    onClick={() => {
+                      setIsDirty(true)
+                      setForm({ ...form, grade: grade as Grade })
+                    }}
                   >
                     {form.grade === grade && <Check size={14} />}
                     {grade}
@@ -260,13 +350,18 @@ function formatCourseName(input: string): string {
             {/* Faixa Etária */}
             <div className="form-group">
               <label className="input-label">Faixa Etária</label>
-              <div className="pill-group">
+              <div className="pill-group" role="radiogroup" aria-label="Faixa etária">
                 {ageRanges.map((age) => (
                   <button
                     key={age}
                     type="button"
+                    role="radio"
+                    aria-checked={form.ageRange === age}
                     className={`pill-option ${form.ageRange === age ? 'active' : ''}`}
-                    onClick={() => setForm({ ...form, ageRange: age as AgeRange })}
+                    onClick={() => {
+                      setIsDirty(true)
+                      setForm({ ...form, ageRange: age as AgeRange })
+                    }}
                   >
                     {form.ageRange === age && <Check size={14} />}
                     {age}
@@ -278,13 +373,18 @@ function formatCourseName(input: string): string {
             {/* Gênero */}
             <div className="form-group">
               <label className="input-label">Gênero</label>
-              <div className="pill-group">
+              <div className="pill-group" role="radiogroup" aria-label="Identificação de gênero">
                 {genders.map((g) => (
                   <button
                     key={g}
                     type="button"
+                    role="radio"
+                    aria-checked={form.gender === g}
                     className={`pill-option ${form.gender === g ? 'active' : ''}`}
-                    onClick={() => setForm({ ...form, gender: g as Gender })}
+                    onClick={() => {
+                      setIsDirty(true)
+                      setForm({ ...form, gender: g as Gender })
+                    }}
                   >
                     {form.gender === g && <Check size={14} />}
                     {g}
@@ -296,7 +396,10 @@ function formatCourseName(input: string): string {
         </section>
 
         {/* ── PERGUNTA 1: Prática Atual ── */}
-        <section className="survey-step-card">
+        <section
+          id="step-1"
+          className={`survey-step-card ${errorCardId === 'step-1' ? 'card-error' : ''}`}
+        >
           <div className="card-header">
             <span className="step-badge">1</span>
             <div>
@@ -305,9 +408,11 @@ function formatCourseName(input: string): string {
             </div>
           </div>
 
-          <div className="choice-cards-row">
+          <div className="choice-cards-row" role="radiogroup" aria-label="Prática de esporte ou atividade física">
             <button
               type="button"
+              role="radio"
+              aria-checked={form.practicesSport}
               className={`choice-card ${form.practicesSport ? 'selected' : ''}`}
               onClick={() => setPractice(true)}
             >
@@ -322,6 +427,8 @@ function formatCourseName(input: string): string {
 
             <button
               type="button"
+              role="radio"
+              aria-checked={!form.practicesSport}
               className={`choice-card ${!form.practicesSport ? 'selected' : ''}`}
               onClick={() => setPractice(false)}
             >
@@ -337,9 +444,21 @@ function formatCourseName(input: string): string {
         </section>
 
         {/* ── PERGUNTA 2: Modalidades Praticadas ── */}
-        <section className={`survey-step-card ${!form.practicesSport ? 'card-disabled' : ''}`}>
+        <section
+          id="step-2"
+          className={`survey-step-card ${!form.practicesSport ? 'card-disabled' : ''} ${errorCardId === 'step-2' ? 'card-error' : ''}`}
+        >
           <div className="card-header">
-            <span className="step-badge">2</span>
+            <div className="step-badge-row">
+              <span className="step-badge">2</span>
+              {form.practicesSport && (
+                <span className={`selection-counter ${form.practicedSports.length > 0 ? 'valid' : 'pending'}`}>
+                  {form.practicedSports.length === 0
+                    ? 'Nenhuma selecionada (obrigatório)'
+                    : `${form.practicedSports.length} selecionada(s)`}
+                </span>
+              )}
+            </div>
             <div>
               <h2>Qual esporte ou atividade você pratica atualmente?</h2>
               <p className="field-help">
@@ -379,7 +498,10 @@ function formatCourseName(input: string): string {
         </section>
 
         {/* ── PERGUNTA 3: Frequência ── */}
-        <section className={`survey-step-card ${!form.practicesSport ? 'card-disabled' : ''}`}>
+        <section
+          id="step-3"
+          className={`survey-step-card ${!form.practicesSport ? 'card-disabled' : ''} ${errorCardId === 'step-3' ? 'card-error' : ''}`}
+        >
           <div className="card-header">
             <span className="step-badge">3</span>
             <div>
@@ -388,7 +510,7 @@ function formatCourseName(input: string): string {
             </div>
           </div>
 
-          <div className="frequency-cards-grid">
+          <div className="frequency-cards-grid" role="radiogroup" aria-label="Frequência semanal de prática">
             {frequencies.map((frequency) => {
               const isSelected = form.frequency === frequency
               const isDisabled = !form.practicesSport && frequency !== 'Não pratico'
@@ -396,9 +518,14 @@ function formatCourseName(input: string): string {
                 <button
                   key={frequency}
                   type="button"
+                  role="radio"
+                  aria-checked={isSelected}
                   disabled={isDisabled}
                   className={`freq-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
-                  onClick={() => setForm({ ...form, frequency: frequency as Frequency })}
+                  onClick={() => {
+                    setIsDirty(true)
+                    setForm({ ...form, frequency: frequency as Frequency })
+                  }}
                 >
                   <span className="freq-radio-dot">{isSelected && <span className="dot-inner" />}</span>
                   <span className="freq-label">{frequency}</span>
@@ -409,7 +536,10 @@ function formatCourseName(input: string): string {
         </section>
 
         {/* ── PERGUNTA 4: Desejo Pessoal ── */}
-        <section className="survey-step-card">
+        <section
+          id="step-4"
+          className={`survey-step-card ${errorCardId === 'step-4' ? 'card-error' : ''}`}
+        >
           <div className="card-header">
             <span className="step-badge">4</span>
             <div>
@@ -421,9 +551,14 @@ function formatCourseName(input: string): string {
           <div className="select-card-wrapper">
             <select
               value={form.desiredSport}
-              onChange={(e) => setForm({ ...form, desiredSport: e.target.value as Sport })}
+              onChange={(e) => {
+                setIsDirty(true)
+                setForm({ ...form, desiredSport: e.target.value as Sport })
+              }}
               className="modern-select full-width"
+              aria-required="true"
             >
+              <option value="" disabled>Selecione uma modalidade...</option>
               {sports.map((sport) => (
                 <option key={sport} value={sport}>
                   {sport}
@@ -434,9 +569,19 @@ function formatCourseName(input: string): string {
         </section>
 
         {/* ── PERGUNTA 5: Barreiras ── */}
-        <section className="survey-step-card">
+        <section
+          id="step-5"
+          className={`survey-step-card ${errorCardId === 'step-5' ? 'card-error' : ''}`}
+        >
           <div className="card-header">
-            <span className="step-badge">5</span>
+            <div className="step-badge-row">
+              <span className="step-badge">5</span>
+              <span className={`selection-counter ${form.barriers.length > 0 ? 'valid' : 'pending'}`}>
+                {form.barriers.length === 0
+                  ? 'Selecione ao menos 1 barreira'
+                  : `${form.barriers.length} selecionada(s)`}
+              </span>
+            </div>
             <div>
               <h2>O que mais dificulta você praticar esportes?</h2>
               <p className="field-help">
@@ -469,13 +614,16 @@ function formatCourseName(input: string): string {
         </section>
 
         {/* ── PERGUNTA 6: Desejadas na Escola ── */}
-        <section className="survey-step-card">
+        <section
+          id="step-6"
+          className={`survey-step-card ${errorCardId === 'step-6' ? 'card-error' : ''}`}
+        >
           <div className="card-header">
             <span className="step-badge">6</span>
             <div>
               <h2>Qual atividade esportiva você mais gostaria de ver na escola?</h2>
               <p className="field-help">
-                Modalidade que o Colégio EREM Santa Ana poderia incentivar em oficinas, torneios ou projetos.
+                Modalidade que a EREM Santa Ana poderia incentivar em oficinas, torneios ou projetos escolares.
               </p>
             </div>
           </div>
@@ -483,9 +631,14 @@ function formatCourseName(input: string): string {
           <div className="select-card-wrapper">
             <select
               value={form.desiredAtSchool}
-              onChange={(e) => setForm({ ...form, desiredAtSchool: e.target.value as Sport })}
+              onChange={(e) => {
+                setIsDirty(true)
+                setForm({ ...form, desiredAtSchool: e.target.value as Sport })
+              }}
               className="modern-select full-width"
+              aria-required="true"
             >
+              <option value="" disabled>Selecione uma modalidade...</option>
               {sports.map((sport) => (
                 <option key={sport} value={sport}>
                   {sport}
@@ -495,7 +648,7 @@ function formatCourseName(input: string): string {
           </div>
         </section>
 
-        {/* Mensagem de Erro */}
+        {/* Mensagem de Erro com role="alert" */}
         {error && (
           <div className="survey-error-alert" role="alert">
             <AlertCircle size={20} />
@@ -506,7 +659,7 @@ function formatCourseName(input: string): string {
         {/* Rodapé do Formulário e Envio */}
         <div className="survey-submit-footer">
           <p className="privacy-note">
-            Ao enviar, sua resposta anônima é somada às estatísticas coletivas da pesquisa.
+            Ao enviar, sua resposta anônima é somada às estatísticas coletivas da pesquisa. O envio é imediato.
           </p>
           <button
             className="primary-button submit-button"

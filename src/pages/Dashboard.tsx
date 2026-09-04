@@ -9,8 +9,7 @@ import {
   ShieldAlert,
   Activity,
   Award,
-  Target,
-  BarChart3,
+  RefreshCw,
 } from 'lucide-react'
 import { ChartCard } from '../components/ChartCard'
 import { getDashboardStats } from '../services/survey'
@@ -23,9 +22,11 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
   const [demo, setDemo] = useState(true)
   const [empty, setEmpty] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    void getDashboardStats()
+  const loadData = () => {
+    setRefreshing(true)
+    return getDashboardStats()
       .then((result) => {
         setStats(result.stats)
         setDemo(result.isDemo)
@@ -35,7 +36,14 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
         setDemo(true)
         setEmpty(false)
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+        setRefreshing(false)
+      })
+  }
+
+  useEffect(() => {
+    void loadData()
   }, [])
 
   const percent = (number: number) =>
@@ -132,7 +140,20 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
               <p className="eyebrow">Painel de Indicadores</p>
               <h2 id="data-title">Visão Geral dos Resultados</h2>
             </div>
-            {demo && <span className="demo-badge">Modo demonstrativo</span>}
+            <div className="heading-actions">
+              {demo && <span className="demo-badge">Modo demonstrativo</span>}
+              <button
+                type="button"
+                className="refresh-button"
+                onClick={loadData}
+                disabled={refreshing}
+                title="Sincronizar indicadores com o banco de dados"
+                aria-label="Atualizar dados do painel"
+              >
+                <RefreshCw size={14} className={refreshing ? 'spinning-icon' : ''} />
+                <span>{refreshing ? 'Atualizando...' : 'Atualizar dados'}</span>
+              </button>
+            </div>
           </div>
 
           <div className="stat-grid">
@@ -165,7 +186,7 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
               <div className="stat-body">
                 <p>Não Praticam</p>
                 <strong>{percent(stats.practices.no)}%</strong>
-                <small>{stats.practices.no} estudantes sedentários</small>
+                <small>{stats.practices.no} estudantes sem prática regular</small>
               </div>
             </article>
 
