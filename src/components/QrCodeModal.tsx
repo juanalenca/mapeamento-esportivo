@@ -4,6 +4,7 @@ import { X, Download, Copy, Check, QrCode, ExternalLink } from 'lucide-react'
 interface QrItem {
   id: string
   title: string
+  shortTitle: string
   subtitle: string
   url: string
   pngPath: string
@@ -15,6 +16,7 @@ const qrItems: QrItem[] = [
   {
     id: 'survey',
     title: 'Responder à Pesquisa',
+    shortTitle: 'Pesquisa',
     subtitle: 'Link direto para os estudantes da EREM Santa Ana responderem no celular.',
     url: 'https://mapeamento-esportivo.web.app/#survey',
     pngPath: '/qrcodes/qrcode-pesquisa.png',
@@ -24,6 +26,7 @@ const qrItems: QrItem[] = [
   {
     id: 'dashboard',
     title: 'Painel de Indicadores',
+    shortTitle: 'Painel',
     subtitle: 'Acesso ao dashboard com estatísticas e gráficos em tempo real.',
     url: 'https://mapeamento-esportivo.web.app/#dashboard',
     pngPath: '/qrcodes/qrcode-painel.png',
@@ -33,6 +36,7 @@ const qrItems: QrItem[] = [
   {
     id: 'about',
     title: 'Sobre o Projeto',
+    shortTitle: 'Sobre',
     subtitle: 'Informações institucionais, metodologia e anonimato.',
     url: 'https://mapeamento-esportivo.web.app/#about',
     pngPath: '/qrcodes/qrcode-sobre.png',
@@ -72,14 +76,18 @@ export function QrCodeModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Abas dos links */}
-        <div className="qrcode-tabs">
+        <div className="qrcode-tabs" role="tablist" aria-label="Links para QR Code">
           {qrItems.map((item) => (
             <button
               key={item.id}
+              role="tab"
+              type="button"
+              aria-selected={selectedId === item.id}
               className={`qrcode-tab-btn ${selectedId === item.id ? 'active' : ''}`}
               onClick={() => setSelectedId(item.id)}
             >
-              <span className="tab-title">{item.title}</span>
+              <span className="tab-title-full">{item.title}</span>
+              <span className="tab-title-short">{item.shortTitle}</span>
               <span className="tab-tag">{item.tag}</span>
             </button>
           ))}
