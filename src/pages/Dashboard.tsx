@@ -10,6 +10,7 @@ import {
   Activity,
   Award,
   RefreshCw,
+  UserCheck,
 } from 'lucide-react'
 import { ChartCard } from '../components/ChartCard'
 import { getDashboardStats, subscribeToDashboardStats } from '../services/survey'
@@ -32,19 +33,22 @@ function formatActivityTime(isoString: string) {
       relative = 'agora mesmo'
     } else if (diffSeconds < 3600) {
       const mins = Math.floor(diffSeconds / 60)
-      relative = `há ${mins} ${mins === 1 ? 'min' : 'min'}`
+      relative = `há ${mins} min`
     } else if (diffSeconds < 86400) {
       const hours = Math.floor(diffSeconds / 3600)
-      relative = `há ${hours} ${hours === 1 ? 'h' : 'h'}`
+      relative = `há ${hours} h`
+    } else if (diffSeconds < 172800) {
+      relative = 'ontem'
     } else {
       const days = Math.floor(diffSeconds / 86400)
-      relative = `há ${days} ${days === 1 ? 'd' : 'd'}`
+      relative = `há ${days} d`
     }
     return { time, date: dateStr, relative }
   } catch {
     return { time: '--:--', date: '--/--/----', relative: '' }
   }
 }
+
 
 export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
   const [stats, setStats] = useState<DashboardStats>(emptyStats)
@@ -274,12 +278,15 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
                   return (
                     <li key={`${item.timestamp}-${index}`} className="activity-feed-item">
                       <div className="activity-item-main">
-                        <span className={`activity-grade-badge grade-${item.grade.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
-                          {item.grade}
-                        </span>
+                        <div
+                          className={`activity-icon-badge grade-${item.grade.toLowerCase().replace(/[^a-z0-9]/g, '')}`}
+                          aria-hidden="true"
+                        >
+                          <UserCheck size={18} />
+                        </div>
                         <div className="activity-item-details">
                           <p className="activity-item-title">
-                            O(A) estudante do <strong>{item.grade}</strong> respondeu à pesquisa
+                            Estudante do <strong>{item.grade}</strong> respondeu à pesquisa
                           </p>
                           <p className="activity-item-timestamp">
                             <Clock size={13} aria-hidden="true" />

@@ -648,6 +648,36 @@ select:focus-visible {
   gap: 14px;
 }
 
+.activity-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.activity-icon-badge.grade-1oano {
+  background: #dff1ec;
+  color: #08726c;
+}
+
+.activity-icon-badge.grade-2oano {
+  background: #e1f0f6;
+  color: #287994;
+}
+
+.activity-icon-badge.grade-3oano {
+  background: #fff1d3;
+  color: #b37410;
+}
+
+.activity-feed-item:hover .activity-icon-badge {
+  transform: scale(1.08);
+}
+
 .activity-grade-badge {
   display: inline-flex;
   align-items: center;

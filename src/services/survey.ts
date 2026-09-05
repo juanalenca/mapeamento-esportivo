@@ -49,7 +49,7 @@ function updateLocalStats(response: SurveyResponse): DashboardStats {
     grade: response.grade,
     timestamp: new Date().toISOString(),
   }
-  const recentActivity = [newActivity, ...(base.recentActivity || [])].slice(0, 5)
+  const recentActivity = [newActivity, ...(base.recentActivity || [])].slice(0, 7)
 
   const updated: DashboardStats = {
     totalResponses: base.totalResponses + 1,
@@ -109,7 +109,7 @@ export async function sendSurveyResponse(response: SurveyResponse) {
           grade: response.grade,
           timestamp: new Date().toISOString(),
         }
-        const recentActivity = [newActivity, ...(base.recentActivity || [])].slice(0, 5)
+        const recentActivity = [newActivity, ...(base.recentActivity || [])].slice(0, 7)
 
         const updated: DashboardStats = {
           totalResponses: (base.totalResponses || 0) + 1,
