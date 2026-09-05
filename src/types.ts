@@ -53,6 +53,11 @@ export interface SurveyResponse {
 
 export interface CountItem { name: string; value: number }
 
+export interface RecentActivityItem {
+  grade: Grade
+  timestamp: string
+}
+
 export interface DashboardStats {
   totalResponses: number
   practices: { yes: number; no: number }
@@ -65,5 +70,7 @@ export interface DashboardStats {
   grades?: CountItem[]
   ageRanges?: CountItem[]
   genders?: CountItem[]
+  recentActivity?: RecentActivityItem[]
   updatedAt?: unknown
 }
+

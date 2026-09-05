@@ -12,4 +12,5 @@ export const emptyStats: DashboardStats = {
   grades: [],
   ageRanges: [],
   genders: [],
+  recentActivity: [],
 }

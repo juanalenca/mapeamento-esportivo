@@ -1,8 +1,8 @@
-import { addDoc, collection, doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, onSnapshot, runTransaction, serverTimestamp } from 'firebase/firestore'
 import { db, firebaseEnabled } from '../lib/firebase'
 import { demoStats } from '../data/demoStats'
 import { emptyStats } from '../data/emptyStats'
-import type { CountItem, DashboardStats, SurveyResponse } from '../types'
+import type { CountItem, DashboardStats, RecentActivityItem, SurveyResponse } from '../types'
 
 const LOCAL_STORAGE_STATS_KEY = 'mapeamento_esportivo_local_stats'
 const LOCAL_STORAGE_RESPONSES_KEY = 'mapeamento_esportivo_local_responses'
@@ -34,6 +34,7 @@ function getLocalStats(): DashboardStats | null {
         grades: parsed.grades?.length ? parsed.grades : (demoStats.grades ?? []),
         ageRanges: parsed.ageRanges?.length ? parsed.ageRanges : (demoStats.ageRanges ?? []),
         genders: parsed.genders?.length ? parsed.genders : (demoStats.genders ?? []),
+        recentActivity: parsed.recentActivity?.length ? parsed.recentActivity : (demoStats.recentActivity ?? []),
       }
     }
   } catch {
@@ -44,6 +45,12 @@ function getLocalStats(): DashboardStats | null {
 
 function updateLocalStats(response: SurveyResponse): DashboardStats {
   const base = getLocalStats() || demoStats
+  const newActivity: RecentActivityItem = {
+    grade: response.grade,
+    timestamp: new Date().toISOString(),
+  }
+  const recentActivity = [newActivity, ...(base.recentActivity || [])].slice(0, 5)
+
   const updated: DashboardStats = {
     totalResponses: base.totalResponses + 1,
     practices: response.practicesSport
@@ -58,6 +65,7 @@ function updateLocalStats(response: SurveyResponse): DashboardStats {
     grades: increment(base.grades ?? demoStats.grades ?? [], response.grade ? [response.grade] : []),
     ageRanges: increment(base.ageRanges ?? demoStats.ageRanges ?? [], response.ageRange ? [response.ageRange] : []),
     genders: increment(base.genders ?? demoStats.genders ?? [], response.gender ? [response.gender] : []),
+    recentActivity,
     updatedAt: new Date().toISOString(),
   }
   try {
@@ -97,6 +105,12 @@ export async function sendSurveyResponse(response: SurveyResponse) {
               genders: [],
             }
 
+        const newActivity: RecentActivityItem = {
+          grade: response.grade,
+          timestamp: new Date().toISOString(),
+        }
+        const recentActivity = [newActivity, ...(base.recentActivity || [])].slice(0, 5)
+
         const updated: DashboardStats = {
           totalResponses: (base.totalResponses || 0) + 1,
           practices: response.practicesSport
@@ -111,6 +125,7 @@ export async function sendSurveyResponse(response: SurveyResponse) {
           grades: increment(base.grades || [], response.grade ? [response.grade] : []),
           ageRanges: increment(base.ageRanges || [], response.ageRange ? [response.ageRange] : []),
           genders: increment(base.genders || [], response.gender ? [response.gender] : []),
+          recentActivity,
           updatedAt: new Date().toISOString(),
         }
 
@@ -146,6 +161,7 @@ export async function getDashboardStats(): Promise<{ stats: DashboardStats; isDe
           grades: data.grades?.length ? data.grades : [],
           ageRanges: data.ageRanges?.length ? data.ageRanges : [],
           genders: data.genders?.length ? data.genders : [],
+          recentActivity: data.recentActivity?.length ? data.recentActivity : [],
         }
         return {
           stats: realStats,
@@ -165,3 +181,61 @@ export async function getDashboardStats(): Promise<{ stats: DashboardStats; isDe
   }
   return { stats: demoStats, isDemo: true, isEmpty: false }
 }
+
+export function subscribeToDashboardStats(
+  onUpdate: (result: { stats: DashboardStats; isDemo: boolean; isEmpty: boolean }) => void,
+  onError?: (error: unknown) => void,
+): () => void {
+  if (firebaseEnabled && db) {
+    const statsRef = doc(db, 'dashboardStats', 'current')
+    const unsubscribe = onSnapshot(
+      statsRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data() as DashboardStats
+          const realStats: DashboardStats = {
+            ...emptyStats,
+            ...data,
+            practicedSports: data.practicedSports?.length ? data.practicedSports : [],
+            desiredSports: data.desiredSports?.length ? data.desiredSports : [],
+            barriers: data.barriers?.length ? data.barriers : [],
+            frequencies: data.frequencies?.length ? data.frequencies : [],
+            desiredAtSchool: data.desiredAtSchool?.length ? data.desiredAtSchool : [],
+            courses: data.courses?.length ? data.courses : [],
+            grades: data.grades?.length ? data.grades : [],
+            ageRanges: data.ageRanges?.length ? data.ageRanges : [],
+            genders: data.genders?.length ? data.genders : [],
+            recentActivity: data.recentActivity?.length ? data.recentActivity : [],
+          }
+          onUpdate({
+            stats: realStats,
+            isDemo: false,
+            isEmpty: realStats.totalResponses === 0,
+          })
+        } else {
+          onUpdate({ stats: emptyStats, isDemo: false, isEmpty: true })
+        }
+      },
+      (error) => {
+        console.warn('Erro na sincronização em tempo real do Firestore:', error)
+        if (onError) onError(error)
+        const local = getLocalStats()
+        if (local) {
+          onUpdate({ stats: local, isDemo: true, isEmpty: false })
+        } else {
+          onUpdate({ stats: demoStats, isDemo: true, isEmpty: false })
+        }
+      },
+    )
+    return unsubscribe
+  }
+
+  const local = getLocalStats()
+  if (local) {
+    onUpdate({ stats: local, isDemo: true, isEmpty: false })
+  } else {
+    onUpdate({ stats: demoStats, isDemo: true, isEmpty: false })
+  }
+  return () => {}
+}
+

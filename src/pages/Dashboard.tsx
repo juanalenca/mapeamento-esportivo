@@ -12,10 +12,39 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import { ChartCard } from '../components/ChartCard'
-import { getDashboardStats } from '../services/survey'
+import { getDashboardStats, subscribeToDashboardStats } from '../services/survey'
 import type { DashboardStats } from '../types'
 import { demoStats } from '../data/demoStats'
 import { emptyStats } from '../data/emptyStats'
+
+function formatActivityTime(isoString: string) {
+  try {
+    const date = new Date(isoString)
+    if (isNaN(date.getTime())) {
+      return { time: '--:--', date: '--/--/----', relative: '' }
+    }
+    const time = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    
+    const diffSeconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000))
+    let relative = ''
+    if (diffSeconds < 60) {
+      relative = 'agora mesmo'
+    } else if (diffSeconds < 3600) {
+      const mins = Math.floor(diffSeconds / 60)
+      relative = `há ${mins} ${mins === 1 ? 'min' : 'min'}`
+    } else if (diffSeconds < 86400) {
+      const hours = Math.floor(diffSeconds / 3600)
+      relative = `há ${hours} ${hours === 1 ? 'h' : 'h'}`
+    } else {
+      const days = Math.floor(diffSeconds / 86400)
+      relative = `há ${days} ${days === 1 ? 'd' : 'd'}`
+    }
+    return { time, date: dateStr, relative }
+  } catch {
+    return { time: '--:--', date: '--/--/----', relative: '' }
+  }
+}
 
 export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
   const [stats, setStats] = useState<DashboardStats>(emptyStats)
@@ -24,9 +53,9 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
-  const loadData = () => {
+  const handleManualRefresh = () => {
     setRefreshing(true)
-    return getDashboardStats()
+    getDashboardStats()
       .then((result) => {
         setStats(result.stats)
         setDemo(result.isDemo)
@@ -34,17 +63,35 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
       })
       .catch(() => {
         setDemo(true)
-        setEmpty(false)
       })
       .finally(() => {
-        setLoading(false)
         setRefreshing(false)
       })
   }
 
   useEffect(() => {
-    void loadData()
+    setLoading(true)
+    const unsubscribe = subscribeToDashboardStats(
+      (result) => {
+        setStats(result.stats)
+        setDemo(result.isDemo)
+        setEmpty(result.isEmpty)
+        setLoading(false)
+        setRefreshing(false)
+      },
+      () => {
+        setDemo(true)
+        setEmpty(false)
+        setLoading(false)
+        setRefreshing(false)
+      },
+    )
+
+    return () => {
+      unsubscribe()
+    }
   }, [])
+
 
   const percent = (number: number) =>
     stats.totalResponses ? Math.round((number / stats.totalResponses) * 100) : 0
@@ -141,11 +188,15 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
               <h2 id="data-title">Visão Geral dos Resultados</h2>
             </div>
             <div className="heading-actions">
+              <div className="live-status-pill" title="Sincronização contínua em tempo real ativada">
+                <span className="live-dot" />
+                <span>Ao vivo</span>
+              </div>
               {demo && <span className="demo-badge">Modo demonstrativo</span>}
               <button
                 type="button"
                 className="refresh-button"
-                onClick={loadData}
+                onClick={handleManualRefresh}
                 disabled={refreshing}
                 title="Sincronizar indicadores com o banco de dados"
                 aria-label="Atualizar dados do painel"
@@ -201,6 +252,58 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
               </div>
             </article>
           </div>
+
+          {/* Feed de Atividades Recentes em Tempo Real */}
+          <section className="recent-activity-card" aria-labelledby="recent-activity-title">
+            <div className="activity-card-header">
+              <div className="activity-card-title-group">
+                <span className="chart-category-badge">Tempo Real</span>
+                <h3 id="recent-activity-title">Últimas Participações Registradas</h3>
+                <p>Acompanhamento instantâneo dos envios por série escolar, data e horário</p>
+              </div>
+              <div className="activity-pulse-indicator" title="Sincronização em tempo real ativa">
+                <span className="live-dot" />
+                <span className="pulse-text">Em tempo real</span>
+              </div>
+            </div>
+
+            {stats.recentActivity && stats.recentActivity.length > 0 ? (
+              <ul className="activity-feed-list" role="list">
+                {stats.recentActivity.map((item, index) => {
+                  const { time, date, relative } = formatActivityTime(item.timestamp)
+                  return (
+                    <li key={`${item.timestamp}-${index}`} className="activity-feed-item">
+                      <div className="activity-item-main">
+                        <span className={`activity-grade-badge grade-${item.grade.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
+                          {item.grade}
+                        </span>
+                        <div className="activity-item-details">
+                          <p className="activity-item-title">
+                            O(A) estudante do <strong>{item.grade}</strong> respondeu à pesquisa
+                          </p>
+                          <p className="activity-item-timestamp">
+                            <Clock size={13} aria-hidden="true" />
+                            <span>Às {time} — {date}</span>
+                          </p>
+                        </div>
+                      </div>
+                      {relative && (
+                        <span className="activity-relative-badge" title={item.timestamp}>
+                          {relative}
+                        </span>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : (
+              <div className="activity-empty-state">
+                <Clock size={20} className="activity-empty-icon" />
+                <p>Aguardando novas participações no formulário. Os envios serão exibidos aqui instantaneamente.</p>
+              </div>
+            )}
+          </section>
+
 
           {/* Seção 1: Perfil Demográfico */}
           <div className="section-heading sub-heading">

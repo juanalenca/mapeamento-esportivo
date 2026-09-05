@@ -62,4 +62,12 @@ export const demoStats: DashboardStats = {
     { name: 'Feminino', value: 39 }, { name: 'Masculino', value: 28 },
     { name: 'Prefiro não informar', value: 8 }, { name: 'Outro', value: 5 },
   ],
+  recentActivity: [
+    { grade: '3º Ano', timestamp: '2026-09-05T14:10:00.000Z' },
+    { grade: '1º Ano', timestamp: '2026-09-05T13:45:00.000Z' },
+    { grade: '2º Ano', timestamp: '2026-09-05T12:20:00.000Z' },
+    { grade: '1º Ano', timestamp: '2026-09-05T10:15:00.000Z' },
+    { grade: '3º Ano', timestamp: '2026-09-05T09:05:00.000Z' },
+  ],
 }
+
