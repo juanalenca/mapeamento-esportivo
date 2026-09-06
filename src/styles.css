@@ -804,6 +804,18 @@ select:focus-visible {
 
 
 /* ── Charts & Visualizations ── */
+.section-subtitle {
+  font-size: 0.94rem;
+  color: #556c67;
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+.section-subtitle strong {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -828,12 +840,28 @@ select:focus-visible {
   border-color: #cfded9;
 }
 
+.chart-card.is-full-width {
+  width: 100%;
+}
+
+.sports-fullwidth-wrap {
+  margin-top: 20px;
+  width: 100%;
+}
+
 .chart-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 8px;
+}
+
+.chart-header-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
 }
 
 .chart-category-badge {
@@ -862,6 +890,17 @@ select:focus-visible {
 .chart-total-pill strong {
   color: var(--color-primary);
   font-weight: 700;
+}
+
+.chart-choice-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #0d7475;
+  background: #eef7f4;
+  border: 1px solid #cce8e0;
+  border-radius: 12px;
+  padding: 2px 7px;
+  white-space: nowrap;
 }
 
 .chart-heading h2 {
@@ -925,88 +964,394 @@ select:focus-visible {
   font-size: 0.8rem;
 }
 
-/* ── Participation Card ── */
-.participation-card {
-  border: 1px solid #d8eae5;
-  border-radius: var(--radius-md);
-  background: linear-gradient(180deg, #f0f7f5 0%, #e6f2ee 100%);
-  padding: clamp(20px, 3vw, 26px);
-  box-shadow: 0 2px 10px rgba(22, 79, 78, 0.05);
+/* ── 4. Frequency Distribution Card (CSS-based visual break) ── */
+.freq-distribution-card {
   display: flex;
   flex-direction: column;
+}
+
+.freq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+  flex: 1;
+  justify-content: center;
+}
+
+.freq-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.freq-info {
+  display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 12px;
 }
 
-.participation-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(22, 79, 78, 0.08);
+.freq-label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #27433f;
 }
 
-.participation-header h2 {
-  font-size: clamp(1.08rem, 2.4vw, 1.2rem);
+.freq-row.is-top .freq-label {
+  font-weight: 700;
+  color: #123e3b;
+}
+
+.freq-pct {
+  font-size: 0.9rem;
+  color: #4b635e;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.freq-row.is-top .freq-pct strong {
+  color: #0d7475;
   font-weight: 800;
-  margin: 4px 0 2px;
-  color: #183e3b;
 }
 
-.participation-header p {
-  font-size: 0.84rem;
+.freq-count {
+  font-size: 0.78rem;
+  color: #7b8e89;
+  font-weight: 400;
+}
+
+.freq-track {
+  height: 10px;
+  background: #edf3f0;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.freq-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.freq-fill.fill-top {
+  background: #0d7475;
+}
+
+.freq-fill.fill-normal {
+  background: #64978d;
+}
+
+/* ── 8. Obstacles Card (Diagnostic & Synthesis) ── */
+.obstacles-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.obstacles-card-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.obstacles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.obstacle-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.obstacle-ordinal {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #f0f5f3;
+  color: #5c726d;
+  font-size: 0.74rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.obstacle-item.is-top .obstacle-ordinal {
+  background: #e6f4f1;
+  color: #0d7475;
+  border: 1px solid #bce2d8;
+}
+
+.obstacle-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.obstacle-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.obstacle-name {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: #27433f;
+}
+
+.obstacle-item.is-top .obstacle-name {
+  font-weight: 700;
+  color: #123e3b;
+}
+
+.obstacle-count {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #1a423e;
+}
+
+.obstacle-track {
+  height: 8px;
+  background: #edf3f0;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.obstacle-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.obstacle-fill.fill-top {
+  background: #0d7475;
+}
+
+.obstacle-fill.fill-normal {
+  background: #64978d;
+}
+
+.obstacles-synthesis-box {
+  background: #f6faf8;
+  border: 1px solid #dbeae5;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.synthesis-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #0d7475;
+}
+
+.synthesis-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #164442;
+  margin: 2px 0 4px;
+}
+
+.synthesis-value-pill {
+  display: inline-block;
+  align-self: flex-start;
+  background: #eaf5f2;
+  border: 1px solid #cbe6df;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.78rem;
+  color: #0d7475;
+  margin-bottom: 6px;
+}
+
+.synthesis-desc {
+  font-size: 0.81rem;
   color: #556c67;
-  margin: 0 0 20px;
+  line-height: 1.4;
+  margin: 0;
 }
 
-.participation-visual {
-  margin: 10px 0 16px;
+/* ── 9. Interests and Demands Comparison ── */
+.interests-demands-section {
+  margin-top: 32px;
 }
 
-.progress-track {
-  height: 18px;
-  border-radius: 20px;
-  background: #cfe2dc;
+.subblock-heading {
+  margin-bottom: 16px;
+}
+
+.subblock-heading .eyebrow {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.subblock-heading h3 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.2rem, 2.6vw, 1.4rem);
+  font-weight: 800;
+  color: #183e3b;
+  margin: 0 0 4px;
+  letter-spacing: -0.4px;
+}
+
+.subblock-heading p {
+  font-size: 0.88rem;
+  color: #556c67;
+  margin: 0;
+}
+
+.interests-demands-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+/* ── 6 & 7. Participation Conclusion Card ── */
+.participation-conclusion-card {
+  margin-top: 32px;
+  margin-bottom: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4faf8 100%);
+  border: 1px solid #d8eae4;
+  border-radius: var(--radius-md);
+  padding: clamp(22px, 3.5vw, 32px);
+  box-shadow: 0 4px 16px rgba(22, 79, 78, 0.05);
+}
+
+.conclusion-header {
+  margin-bottom: 14px;
+}
+
+.conclusion-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: #0d7475;
+}
+
+.conclusion-header h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.2rem, 2.6vw, 1.45rem);
+  font-weight: 800;
+  color: #183e3b;
+  margin: 3px 0 0;
+  letter-spacing: -0.4px;
+}
+
+.conclusion-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 16px 0 12px;
+  flex-wrap: wrap;
+}
+
+.conclusion-hero-number {
+  font-family: var(--font-heading);
+  font-size: clamp(2.8rem, 6vw, 3.8rem);
+  font-weight: 800;
+  color: #075f61;
+  line-height: 1;
+  letter-spacing: -1.5px;
+}
+
+.conclusion-hero-label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #304e4a;
+  margin: 0;
+}
+
+.conclusion-track-wrap {
+  margin: 12px 0 16px;
+}
+
+.conclusion-progress-track {
+  height: 20px;
+  border-radius: 12px;
+  background: #d4e7e1;
   overflow: hidden;
   width: 100%;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.progress-track span {
+.conclusion-progress-fill {
   height: 100%;
-  display: block;
-  background: linear-gradient(90deg, #0d7475 0%, #15a19b 100%);
   border-radius: inherit;
+  background: linear-gradient(90deg, #075f61 0%, #0d7475 50%, #15a19b 100%);
   transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(13, 116, 117, 0.3);
+  box-shadow: 0 2px 8px rgba(13, 116, 117, 0.25);
 }
 
-.legend {
+.conclusion-metrics-row {
   display: flex;
-  gap: 22px;
-  padding: 14px 0 10px;
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
+  gap: 24px;
+  align-items: center;
   flex-wrap: wrap;
+  margin-bottom: 18px;
+  font-size: 0.9rem;
+  color: #435c57;
 }
 
-.legend-item {
+.conclusion-metric-col {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.legend i {
-  display: inline-block;
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
+.conclusion-metric-col strong {
+  color: #1a423e;
+  font-weight: 700;
 }
 
-.legend .yes { background: #0d7475; box-shadow: 0 0 6px rgba(13, 116, 117, 0.4); }
-.legend .no { background: #bbcfc9; }
-.legend strong { color: #1a423f; }
+.metric-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
 
-.participation-cta {
-  align-self: flex-start;
-  margin-top: 10px;
+.yes-dot {
+  background: #0d7475;
+  box-shadow: 0 0 6px rgba(13, 116, 117, 0.35);
+}
+
+.no-dot {
+  background: #b2cac3;
+}
+
+.conclusion-insight-box {
+  background: #eef7f4;
+  border-left: 4px solid #0d7475;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  font-size: 0.92rem;
+  color: #244844;
+  line-height: 1.5;
+}
+
+.conclusion-insight-box p {
+  margin: 0;
 }
 
 /* ── Empty State ── */
@@ -1759,7 +2104,8 @@ select:focus-visible {
     opacity: 0.38;
   }
 
-  .chart-grid {
+  .chart-grid,
+  .interests-demands-grid {
     grid-template-columns: 1fr;
   }
 

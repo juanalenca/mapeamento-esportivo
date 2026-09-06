@@ -8,6 +8,10 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import { ChartCard } from '../components/ChartCard'
+import { FrequencyCard } from '../components/FrequencyCard'
+import { ObstaclesCard } from '../components/ObstaclesCard'
+import { InterestsDemandsComparison } from '../components/InterestsDemandsComparison'
+import { ParticipationConclusion } from '../components/ParticipationConclusion'
 import { getDashboardStats, subscribeToDashboardStats } from '../services/survey'
 import type { DashboardStats } from '../types'
 import { demoStats } from '../data/demoStats'
@@ -316,7 +320,10 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <div className="section-heading sub-heading">
             <div>
               <p className="eyebrow">Demografia Discente</p>
-              <h2>Quem São os Participantes</h2>
+              <h2>Quem são os participantes</h2>
+              <p className="section-subtitle">
+                <strong>{stats.totalResponses}</strong> estudantes responderam à pesquisa.
+              </p>
             </div>
           </div>
           <div className="chart-grid">
@@ -325,24 +332,40 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
               title="Distribuição por curso / itinerário"
               description="Distribuição dos participantes por curso ou itinerário na EREM Santa Ana"
               data={stats.courses?.length ? stats.courses : (demoStats.courses ?? [])}
+              hideTotalBadge={true}
+              singleColorWithHighlight={true}
+              cleanGrid={true}
+              showValueLabels={true}
             />
             <ChartCard
               categoryBadge="Gênero"
               title="Distribuição por gênero"
               description="Identificação informada pelos participantes"
               data={stats.genders?.length ? stats.genders : (demoStats.genders ?? [])}
+              hideTotalBadge={true}
+              singleColorWithHighlight={true}
+              cleanGrid={true}
+              showValueLabels={true}
             />
             <ChartCard
               categoryBadge="Série"
               title="Distribuição por série"
               description="Ano letivo dos estudantes respondentes"
               data={stats.grades?.length ? stats.grades : (demoStats.grades ?? [])}
+              hideTotalBadge={true}
+              singleColorWithHighlight={true}
+              cleanGrid={true}
+              showValueLabels={true}
             />
             <ChartCard
               categoryBadge="Idade"
               title="Distribuição por faixa etária"
               description="Faixas de idade dos estudantes da escola"
               data={stats.ageRanges?.length ? stats.ageRanges : (demoStats.ageRanges ?? [])}
+              hideTotalBadge={true}
+              singleColorWithHighlight={true}
+              cleanGrid={true}
+              showValueLabels={true}
             />
           </div>
 
@@ -350,67 +373,46 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <div className="section-heading sub-heading">
             <div>
               <p className="eyebrow">Diagnóstico Esportivo</p>
-              <h2>Hábitos, Interesses e Demandas</h2>
+              <h2>Hábitos, interesses e demandas</h2>
+              <p className="section-subtitle">
+                O que os estudantes praticam, desejam praticar e esperam da escola.
+              </p>
             </div>
           </div>
-          <div className="chart-grid">
+
+          {/* 1. Modalidades mais praticadas (Card Amplo Full-width) */}
+          <div className="sports-fullwidth-wrap">
             <ChartCard
               categoryBadge="Prática Atual"
               title="Modalidades mais praticadas"
-              description="Atividades esportivas realizadas com frequência"
+              description="Atividades esportivas realizadas com frequência pelos estudantes"
               data={stats.practicedSports?.length ? stats.practicedSports : demoStats.practicedSports}
+              isMultipleChoice={true}
+              singleColorWithHighlight={true}
+              cleanGrid={true}
+              showValueLabels={true}
+              isFullWidth={true}
             />
-            <ChartCard
-              categoryBadge="Regularidade"
-              title="Frequência semanal de prática"
-              description="Quantas vezes por semana praticam atividade"
+          </div>
+
+          {/* 2. Grid de Regularidade e Obstáculos */}
+          <div className="chart-grid sports-diagnostic-grid">
+            <FrequencyCard
               data={stats.frequencies?.length ? stats.frequencies : (demoStats.frequencies ?? [])}
             />
-            <ChartCard
-              categoryBadge="Interesse Pessoal"
-              title="Atividades que gostariam de praticar"
-              description="Modalidades de maior interesse para aprender"
-              data={stats.desiredSports?.length ? stats.desiredSports : demoStats.desiredSports}
-            />
-            <ChartCard
-              categoryBadge="Demanda Escolar"
-              title="Modalidades desejadas na escola"
-              description="Projetos e esportes para incentivo na EREM Santa Ana"
-              data={stats.desiredAtSchool?.length ? stats.desiredAtSchool : (demoStats.desiredAtSchool ?? [])}
-            />
-            <ChartCard
-              categoryBadge="Obstáculos"
-              title="Principais dificuldades enfrentadas"
-              description="O que mais limita os alunos de praticarem esportes"
+            <ObstaclesCard
               data={stats.barriers?.length ? stats.barriers : demoStats.barriers}
             />
-
-            <section className="participation-card">
-              <div className="participation-header">
-                <span className="chart-category-badge">Taxa de Adesão</span>
-                <h2>Participação Esportiva Geral</h2>
-                <p>Proporção de estudantes ativos vs não praticantes na amostra.</p>
-              </div>
-
-              <div className="participation-visual">
-                <div className="progress-track">
-                  <span style={{ width: `${percent(stats.practices.yes)}%` }} />
-                </div>
-                <div className="legend">
-                  <span className="legend-item">
-                    <i className="yes" /> Praticam <strong>{percent(stats.practices.yes)}%</strong>
-                  </span>
-                  <span className="legend-item">
-                    <i className="no" /> Não praticam <strong>{percent(stats.practices.no)}%</strong>
-                  </span>
-                </div>
-              </div>
-
-              <button onClick={onSurvey} className="primary-button participation-cta">
-                Responder à pesquisa <ArrowRight size={16} />
-              </button>
-            </section>
           </div>
+
+          {/* 3. Comparativo Integrado: Interesses Pessoais vs Demandas da Escola */}
+          <InterestsDemandsComparison
+            desiredSports={stats.desiredSports?.length ? stats.desiredSports : demoStats.desiredSports}
+            desiredAtSchool={stats.desiredAtSchool?.length ? stats.desiredAtSchool : (demoStats.desiredAtSchool ?? [])}
+          />
+
+          {/* 4. Conclusão: Participação Esportiva Geral */}
+          <ParticipationConclusion practices={stats.practices} />
         </section>
       )}
     </main>
