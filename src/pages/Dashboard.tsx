@@ -1,14 +1,10 @@
 import { useEffect, useState } from 'react'
 import {
   ArrowRight,
-  ClipboardList,
-  Users,
   Sparkles,
   Trophy,
   Clock,
   ShieldAlert,
-  Activity,
-  Award,
   RefreshCw,
 } from 'lucide-react'
 import { ChartCard } from '../components/ChartCard'
@@ -188,7 +184,7 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <div className="section-heading">
             <div>
               <p className="eyebrow">Painel de Indicadores</p>
-              <h2 id="data-title">Visão Geral dos Resultados</h2>
+              <h2 id="data-title">Visão geral dos resultados</h2>
             </div>
             <div className="heading-actions">
               <div className="live-status-pill" title="Sincronização contínua em tempo real ativada">
@@ -210,51 +206,54 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
             </div>
           </div>
 
-          <div className="stat-grid">
-            <article className="stat-card stat-teal">
-              <span className="stat-icon teal">
-                <Users size={22} />
-              </span>
-              <div className="stat-body">
-                <p>Total de Respostas</p>
-                <strong>{stats.totalResponses}</strong>
-                <small>Participações registradas</small>
+          {/* Painel Unificado de Visão Geral */}
+          <section className="overview-story-card" aria-labelledby="data-title">
+            <div className="overview-story-top">
+              {/* 1. Participações (Elemento Principal) */}
+              <div className="overview-stat-col col-main">
+                <span className="overview-col-label">Participações</span>
+                <div className="overview-metric-wrap">
+                  <span className="overview-hero-number">{stats.totalResponses}</span>
+                  <span className="overview-hero-text">respostas registradas</span>
+                </div>
               </div>
-            </article>
 
-            <article className="stat-card stat-gold">
-              <span className="stat-icon gold">
-                <Activity size={22} />
-              </span>
-              <div className="stat-body">
-                <p>Praticam Atividade</p>
-                <strong>{percent(stats.practices.yes)}%</strong>
-                <small>{stats.practices.yes} estudantes ativos</small>
+              {/* 2. Prática de Atividade Física (Secundário) */}
+              <div className="overview-stat-col col-practice">
+                <span className="overview-col-label">Prática de Atividades</span>
+                <div className="overview-metric-wrap">
+                  <span className="overview-secondary-number">{percent(stats.practices.yes)}%</span>
+                  <span className="overview-secondary-text">praticam atividade física</span>
+                </div>
               </div>
-            </article>
 
-            <article className="stat-card stat-blue">
-              <span className="stat-icon blue">
-                <ClipboardList size={22} />
-              </span>
-              <div className="stat-body">
-                <p>Não Praticam</p>
-                <strong>{percent(stats.practices.no)}%</strong>
-                <small>{stats.practices.no} estudantes sem prática regular</small>
+              {/* 3. Descoberta Qualitativa (Principal Interesse) */}
+              <div className="overview-stat-col col-interest">
+                <div className="overview-interest-header">
+                  <span className="overview-col-label">Interesse mais citado</span>
+                  <span className="overview-rank-pill">#1 interesse</span>
+                </div>
+                <div className="overview-metric-wrap">
+                  <span className="overview-discovery-name">{stats.desiredSports[0]?.name ?? '—'}</span>
+                  <span className="overview-discovery-text">modalidade desejada</span>
+                </div>
               </div>
-            </article>
+            </div>
 
-            <article className="stat-card stat-coral">
-              <span className="stat-icon coral">
-                <Award size={22} />
-              </span>
-              <div className="stat-body">
-                <p>Principal Interesse</p>
-                <strong>{stats.desiredSports[0]?.name ?? '—'}</strong>
-                <small>{stats.desiredSports[0]?.value ?? 0} estudantes desejam</small>
+            <div className="overview-story-divider" aria-hidden="true" />
+
+            <div className="overview-story-bottom">
+              <div className="overview-bottom-col">
+                <strong>{stats.practices.yes}</strong> estudantes praticam atividade física
               </div>
-            </article>
-          </div>
+              <div className="overview-bottom-col">
+                <strong>{stats.practices.no}</strong> estudantes sem prática regular ({percent(stats.practices.no)}%)
+              </div>
+              <div className="overview-bottom-col">
+                <strong>{stats.desiredSports[0]?.value ?? 0} estudantes</strong> demonstraram interesse
+              </div>
+            </div>
+          </section>
 
           {/* Feed de Atividades Recentes em Tempo Real */}
           <section className="recent-activity-card" aria-labelledby="recent-activity-title">
