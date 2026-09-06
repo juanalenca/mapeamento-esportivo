@@ -409,6 +409,7 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <InterestsDemandsComparison
             desiredSports={stats.desiredSports?.length ? stats.desiredSports : demoStats.desiredSports}
             desiredAtSchool={stats.desiredAtSchool?.length ? stats.desiredAtSchool : (demoStats.desiredAtSchool ?? [])}
+            totalResponses={stats.totalResponses}
           />
 
           {/* 4. Conclusão: Participação Esportiva Geral */}

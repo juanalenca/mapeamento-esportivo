@@ -1234,6 +1234,20 @@ select:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 18px;
+  align-items: stretch;
+}
+
+.interests-demands-grid .chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.interests-demands-grid .chart-heading {
+  min-height: 74px;
+}
+
+.interests-demands-grid .chart {
+  margin-top: 14px;
 }
 
 /* ── 6 & 7. Participation Conclusion Card ── */
