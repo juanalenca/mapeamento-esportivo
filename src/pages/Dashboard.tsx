@@ -10,7 +10,6 @@ import {
   Activity,
   Award,
   RefreshCw,
-  UserCheck,
 } from 'lucide-react'
 import { ChartCard } from '../components/ChartCard'
 import { getDashboardStats, subscribeToDashboardStats } from '../services/survey'
@@ -261,13 +260,12 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
           <section className="recent-activity-card" aria-labelledby="recent-activity-title">
             <div className="activity-card-header">
               <div className="activity-card-title-group">
-                <span className="chart-category-badge">Tempo Real</span>
-                <h3 id="recent-activity-title">Últimas Participações Registradas</h3>
-                <p>Acompanhamento instantâneo dos envios por série escolar, data e horário</p>
+                <h3 id="recent-activity-title">Últimas participações</h3>
+                <p>Envios mais recentes da pesquisa</p>
               </div>
-              <div className="activity-pulse-indicator" title="Sincronização em tempo real ativa">
+              <div className="activity-live-badge" title="Sincronização em tempo real ativa">
                 <span className="live-dot" />
-                <span className="pulse-text">Em tempo real</span>
+                <span>Ao vivo</span>
               </div>
             </div>
 
@@ -275,38 +273,32 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
               <ul className="activity-feed-list" role="list">
                 {stats.recentActivity.map((item, index) => {
                   const { time, date, relative } = formatActivityTime(item.timestamp)
+                  const gradeClass = `grade-${item.grade.toLowerCase().replace(/[^a-z0-9]/g, '')}`
                   return (
                     <li key={`${item.timestamp}-${index}`} className="activity-feed-item">
-                      <div className="activity-item-main">
-                        <div
-                          className={`activity-icon-badge grade-${item.grade.toLowerCase().replace(/[^a-z0-9]/g, '')}`}
-                          aria-hidden="true"
-                        >
-                          <UserCheck size={18} />
-                        </div>
-                        <div className="activity-item-details">
-                          <p className="activity-item-title">
-                            Estudante do <strong>{item.grade}</strong> respondeu à pesquisa
-                          </p>
-                          <p className="activity-item-timestamp">
-                            <Clock size={13} aria-hidden="true" />
-                            <span>Às {time} — {date}</span>
-                          </p>
+                      <div className="activity-item-left">
+                        <span className={`activity-bullet ${gradeClass}`} aria-hidden="true" />
+                        <div className="activity-item-info">
+                          <strong className="activity-grade-name">{item.grade}</strong>
+                          <span className="activity-timestamp">{time} · {date}</span>
                         </div>
                       </div>
-                      {relative && (
-                        <span className="activity-relative-badge" title={item.timestamp}>
-                          {relative}
-                        </span>
-                      )}
+                      <div className="activity-item-right">
+                        <span className="activity-action-label">Pesquisa respondida</span>
+                        {relative && (
+                          <span className="activity-relative-badge" title={item.timestamp}>
+                            {relative}
+                          </span>
+                        )}
+                      </div>
                     </li>
                   )
                 })}
               </ul>
             ) : (
               <div className="activity-empty-state">
-                <Clock size={20} className="activity-empty-icon" />
-                <p>Aguardando novas participações no formulário. Os envios serão exibidos aqui instantaneamente.</p>
+                <Clock size={18} className="activity-empty-icon" />
+                <p>Aguardando novos envios no formulário em tempo real.</p>
               </div>
             )}
           </section>
