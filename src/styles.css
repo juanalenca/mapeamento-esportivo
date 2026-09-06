@@ -396,6 +396,11 @@ select:focus-visible {
   flex-wrap: wrap;
 }
 
+.section-heading.sub-heading {
+  margin-top: clamp(38px, 5.5vw, 48px);
+  margin-bottom: 16px;
+}
+
 .section-heading h2,
 .chart-heading h2,
 .participation-card h2,
@@ -845,8 +850,13 @@ select:focus-visible {
 }
 
 .sports-fullwidth-wrap {
-  margin-top: 20px;
+  margin-top: 0;
+  margin-bottom: 18px;
   width: 100%;
+}
+
+.sports-diagnostic-grid {
+  margin-top: 0;
 }
 
 .chart-heading {
@@ -1188,7 +1198,7 @@ select:focus-visible {
 
 /* ── 9. Interests and Demands Comparison ── */
 .interests-demands-section {
-  margin-top: 32px;
+  margin-top: clamp(38px, 5.5vw, 48px);
 }
 
 .subblock-heading {
@@ -1228,7 +1238,7 @@ select:focus-visible {
 
 /* ── 6 & 7. Participation Conclusion Card ── */
 .participation-conclusion-card {
-  margin-top: 32px;
+  margin-top: clamp(38px, 5.5vw, 48px);
   margin-bottom: 24px;
   background: linear-gradient(180deg, #ffffff 0%, #f4faf8 100%);
   border: 1px solid #d8eae4;
