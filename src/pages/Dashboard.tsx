@@ -220,10 +220,10 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
 
               {/* 2. Prática de Atividade Física (Secundário) */}
               <div className="overview-stat-col col-practice">
-                <span className="overview-col-label">Prática de Atividades</span>
+                <span className="overview-col-label">Prática de atividade física</span>
                 <div className="overview-metric-wrap">
                   <span className="overview-secondary-number">{percent(stats.practices.yes)}%</span>
-                  <span className="overview-secondary-text">praticam atividade física</span>
+                  <span className="overview-secondary-text">praticam regularmente</span>
                 </div>
               </div>
 
@@ -231,11 +231,11 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
               <div className="overview-stat-col col-interest">
                 <div className="overview-interest-header">
                   <span className="overview-col-label">Interesse mais citado</span>
-                  <span className="overview-rank-pill">#1 interesse</span>
+                  <span className="overview-rank-pill">1º mais citado</span>
                 </div>
                 <div className="overview-metric-wrap">
                   <span className="overview-discovery-name">{stats.desiredSports[0]?.name ?? '—'}</span>
-                  <span className="overview-discovery-text">modalidade desejada</span>
+                  <span className="overview-discovery-text">interesse mais citado</span>
                 </div>
               </div>
             </div>
@@ -244,13 +244,22 @@ export function Dashboard({ onSurvey }: { onSurvey: () => void }) {
 
             <div className="overview-story-bottom">
               <div className="overview-bottom-col">
-                <strong>{stats.practices.yes}</strong> estudantes praticam atividade física
+                <span className="overview-bottom-count">
+                  <strong>{stats.practices.yes}</strong> estudantes
+                </span>
+                <span className="overview-bottom-label">praticam atividade física</span>
               </div>
               <div className="overview-bottom-col">
-                <strong>{stats.practices.no}</strong> estudantes sem prática regular ({percent(stats.practices.no)}%)
+                <span className="overview-bottom-count">
+                  <strong>{stats.practices.no}</strong> estudantes
+                </span>
+                <span className="overview-bottom-label">sem prática regular ({percent(stats.practices.no)}%)</span>
               </div>
               <div className="overview-bottom-col">
-                <strong>{stats.desiredSports[0]?.value ?? 0} estudantes</strong> demonstraram interesse
+                <span className="overview-bottom-count">
+                  <strong>{stats.desiredSports[0]?.value ?? 0}</strong> estudantes
+                </span>
+                <span className="overview-bottom-label">demonstraram interesse</span>
               </div>
             </div>
           </section>
